@@ -2,9 +2,12 @@
 
 Traefik plugin to scale containers ondemand
 
-## Required
+## How to use it
 
-- Service to scale is a swarm service
+### Required
+
+- Swarm mode
+- [Traefik ondemand service](https://github.com/acouvreur/traefik-ondemand-service) up and running
 
 ## Develop the plugin
 
