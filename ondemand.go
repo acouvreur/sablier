@@ -2,8 +2,9 @@ package traefik_ondemand_plugin
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -41,9 +42,31 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 	}, nil
 }
 
-func (e *Ondemand) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	fmt.Printf("%+v\n", e.ServiceUrl)
-	log.Println("plugin executed")
+type ServiceResponse struct {
+	status string `json:status`
+}
 
+func (e *Ondemand) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	resp, err := http.Get(e.ServiceUrl)
+	if err != nil {
+		println("Could not contact", e.ServiceUrl)
+		e.next.ServeHTTP(rw, req)
+		return
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		println("Could not parse service response")
+		e.next.ServeHTTP(rw, req)
+		return
+	}
+	serviceResponse := &ServiceResponse{}
+	err = json.Unmarshal(body, serviceResponse)
+	if err != nil {
+		fmt.Println("error:", err)
+		e.next.ServeHTTP(rw, req)
+		return
+	}
+	fmt.Printf("%+v\n", serviceResponse)
 	e.next.ServeHTTP(rw, req)
 }

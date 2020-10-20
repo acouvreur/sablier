@@ -21,7 +21,7 @@ services:
     image: containous/whoami
     deploy:
       labels:
-        - traefik.http.middlewares.ondemand.plugin.dev.ServiceUrl=google.com
+        - traefik.http.middlewares.ondemand.plugin.dev.ServiceUrl=http://google.com
         - traefik.http.routers.whoami.entrypoints=http
         - traefik.http.routers.whoami.middlewares=ondemand@docker
         - traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)
