@@ -1,0 +1,11 @@
+displayName: ondemand traefik plugin
+type: middleware
+
+import: github.com/acouvreur/traefik-ondemand-plugin
+
+summary: 'Scale swarm services on demand when requested'
+
+testData:
+  serviceUrl: 'http://google.com'
+  timeoutSeconds: 5 
+  
