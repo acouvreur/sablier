@@ -101,15 +101,11 @@ func (service *Service) HandleServiceState(cli *client.Client) (string, error) {
 	}
 	if status == UP {
 		fmt.Printf("- Service %v is up\n", service.name)
-		fmt.Printf("up %+v\n", time.Now())
 		if !service.isHandled {
-			fmt.Printf("not handled %+v\n", time.Now())
 			go service.stopAfterTimeout(cli)
 		}
-		fmt.Printf("before write %+v\n", time.Now())
 		select {
 		case service.time <- service.timeout:
-			fmt.Printf("after write %+v\n", time.Now())
 		default:
 		}
 		return "started", nil
