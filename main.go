@@ -30,7 +30,6 @@ func handleRequests(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Error: %+v\n ", err)
 		fmt.Fprintf(w, "%+v", err)
 	}
-	fmt.Printf("Service after query: %+v\n", service)
 	fmt.Fprintf(w, "%+v", service)
 
 }
@@ -66,17 +65,18 @@ func main() {
 type Status string
 
 const (
-	UP      Status = "up"
-	DOWN    Status = "down"
-	UNKNOWN Status = "unknown"
+	UP       Status = "up"
+	DOWN     Status = "down"
+	STARTING Status = "starting"
+	UNKNOWN  Status = "unknown"
 )
 
 // Service holds all information related to a service
 type Service struct {
-	name           string
-	timeout        uint64
-	initialTimeout uint64
-	status         Status
+	name      string
+	timeout   uint64
+	time      chan uint64
+	isHandled bool
 }
 
 var services = map[string]*Service{}
@@ -86,7 +86,7 @@ func GetOrCreateService(name string, timeout uint64) *Service {
 	if services[name] != nil {
 		return services[name]
 	}
-	service := &Service{name, timeout, timeout, UNKNOWN}
+	service := &Service{name, timeout, make(chan uint64), false}
 
 	services[name] = service
 	return service
@@ -94,16 +94,27 @@ func GetOrCreateService(name string, timeout uint64) *Service {
 
 // HandleServiceState up the service if down or set timeout for downing the service
 func (service *Service) HandleServiceState(cli *client.Client) error {
-	if service.isUp() == true {
+	status, err := service.getStatus(cli)
+	if err != nil {
+		return err
+	}
+	if status == UP {
 		fmt.Printf("- Service %v is up\n", service.name)
-		service.timeout = service.initialTimeout
+		if !service.isHandled {
+			go service.stopAfterTimeout(cli)
+		}
+		service.time <- service.timeout
+	} else if status == STARTING {
+		fmt.Printf("- Service %v is starting\n", service.name)
+		if err != nil {
+			return err
+		}
 		go service.stopAfterTimeout(cli)
-	} else if service.isDown() {
+	} else if status == DOWN {
 		fmt.Printf("- Service %v is down\n", service.name)
 		service.start(cli)
 	} else {
 		fmt.Printf("- Service %v status is unknown\n", service.name)
-		err := service.setServiceStateFromDocker(cli)
 		if err != nil {
 			return err
 		}
@@ -112,45 +123,44 @@ func (service *Service) HandleServiceState(cli *client.Client) error {
 	return nil
 }
 
-func (service *Service) isUp() bool {
-	return service.status == UP
-}
-
-func (service *Service) isDown() bool {
-	return service.status == DOWN
-}
-
-func (service *Service) setServiceStateFromDocker(client *client.Client) error {
+func (service *Service) getStatus(client *client.Client) (Status, error) {
 	ctx := context.Background()
 	dockerService, err := service.getDockerService(ctx, client)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	status := UP
-	fmt.Printf("replicas %d\n", dockerService.Spec.Mode.Replicated.Replicas)
 	if *dockerService.Spec.Mode.Replicated.Replicas == zeroReplica {
-		status = DOWN
+		return DOWN, nil
 	}
-	service.status = status
-	return nil
+	return UP, nil
 }
 
 func (service *Service) start(client *client.Client) {
 	fmt.Printf("Starting service %s\n", service.name)
+	service.isHandled = true
 	service.setServiceReplicas(client, 1)
-	service.timeout = service.initialTimeout
 	go service.stopAfterTimeout(client)
+	service.time <- service.timeout
 }
 
 func (service *Service) stopAfterTimeout(client *client.Client) {
-	for service.timeout > 0 {
-		time.Sleep(1 * time.Second)
-		service.timeout--
+	service.isHandled = true
+	for {
+		select {
+		case timeout, ok := <-service.time:
+			if ok {
+				time.Sleep(time.Duration(timeout) * time.Second)
+			} else {
+				fmt.Println("That should not happen, but we never know ;)")
+			}
+		default:
+			fmt.Printf("Stopping service %s\n", service.name)
+			service.setServiceReplicas(client, 0)
+			return
+		}
 	}
-	fmt.Printf("Stopping service %s\n", service.name)
-	service.setServiceReplicas(client, 0)
 }
 
 func (service *Service) setServiceReplicas(client *client.Client, replicas uint64) error {
