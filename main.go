@@ -55,6 +55,7 @@ func parseParams(w http.ResponseWriter, r *http.Request) (string, uint64) {
 }
 
 func main() {
+	fmt.Println("Server listening on port 10000.")
 	http.HandleFunc("/", handleRequests)
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
