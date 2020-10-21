@@ -45,6 +45,13 @@ We are running "traefik-ondemand-service" to interact freely with the docker dea
 
 -> The source is available at https://github.com/acouvreur/traefik-ondemand-service
 
+## TODO
+
+- [ ] Embed "traefik-ondemand-service" inside the plugin directly
+- [ ] Scale **up** service (max replica, threshold)
+- [ ] Scale down from N to 1 (threshold)
+- [ ] Kubernetes integration
+
 ## Authors
 
 [Alexis Couvreur](https://www.linkedin.com/in/alexis-couvreur/) (left) and [Alexandre Hiltcher](https://www.linkedin.com/in/alexandre-hiltcher/) (right)
