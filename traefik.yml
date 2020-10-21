@@ -19,3 +19,7 @@ entryPoints:
 providers:
   docker:
     swarmMode: true
+    exposedByDefault: false
+  file:
+    filename: "/etc/traefik/config.yml"
+    watch: true

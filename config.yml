@@ -1,0 +1,22 @@
+http:
+  middlewares:
+    ondemand:
+      plugin:
+        dev:
+          serviceUrl: http://ondemand:10000
+          dockerServiceName: TRAEFIK_HACKATHON_whoami
+
+  services:
+    whoami:
+      loadBalancer:
+        servers:
+        - url: "http://whoami:80"
+
+  routers:
+    whoami:
+      rule: PathPrefix(`/whoami`)
+      entryPoints:
+        - "http"
+      middlewares:
+        - ondemand
+      service: "whoami"

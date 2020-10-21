@@ -11,18 +11,18 @@ services:
       - './traefik.yml:/etc/traefik/traefik-template.yml'
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '.:/plugins/go/src/github.com/acouvreur/traefik-ondemand-plugin'
+      - './config.yml:/etc/traefik/config.yml'
     environment:
       - TRAEFIK_PILOT_TOKEN
     deploy:
       labels:
+        - traefik.enable=true
         - traefik.http.services.traefik.loadbalancer.server.port=8080
+
+  ondemand:
+    image: acouvreur/traefik-ondemand-service:latest
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
 
   whoami:
     image: containous/whoami
-    deploy:
-      labels:
-        - traefik.http.middlewares.ondemand.plugin.dev.ServiceUrl=http://google.com
-        - traefik.http.routers.whoami.entrypoints=http
-        - traefik.http.routers.whoami.middlewares=ondemand@docker
-        - traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)
-        - traefik.http.services.whoami.loadbalancer.server.port=80

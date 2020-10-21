@@ -2,18 +2,18 @@ package traefik_ondemand_plugin
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
-const defaultTimeoutSeconds = 60
+const defaultTimeoutSeconds = 10
 
 // Config the plugin configuration
 type Config struct {
-	ServiceUrl     string
-	TimeoutSeconds uint64
+	DockerServiceName string
+	ServiceUrl        string
+	TimeoutSeconds    uint64
 }
 
 func CreateConfig() *Config {
@@ -23,10 +23,11 @@ func CreateConfig() *Config {
 }
 
 type Ondemand struct {
-	next           http.Handler
-	name           string
-	ServiceUrl     string
-	TimeoutSeconds uint64
+	next              http.Handler
+	name              string
+	ServiceUrl        string
+	TimeoutSeconds    uint64
+	DockerServiceName string
 }
 
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
@@ -35,21 +36,19 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 	}
 
 	return &Ondemand{
-		next:           next,
-		name:           name,
-		ServiceUrl:     config.ServiceUrl,
-		TimeoutSeconds: config.TimeoutSeconds,
+		next:              next,
+		name:              name,
+		ServiceUrl:        config.ServiceUrl,
+		DockerServiceName: config.DockerServiceName,
+		TimeoutSeconds:    config.TimeoutSeconds,
 	}, nil
 }
 
-type ServiceResponse struct {
-	status string `json:status`
-}
-
 func (e *Ondemand) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	resp, err := http.Get(e.ServiceUrl)
+	url := fmt.Sprintf("%s/?name=%s&timeout=%d", e.ServiceUrl, e.DockerServiceName, e.TimeoutSeconds)
+	resp, err := http.Get(url)
 	if err != nil {
-		println("Could not contact", e.ServiceUrl)
+		println("Could not contact", url)
 		e.next.ServeHTTP(rw, req)
 		return
 	}
@@ -60,13 +59,18 @@ func (e *Ondemand) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		e.next.ServeHTTP(rw, req)
 		return
 	}
-	serviceResponse := &ServiceResponse{}
-	err = json.Unmarshal(body, serviceResponse)
-	if err != nil {
-		fmt.Println("error:", err)
+
+	fmt.Printf("%s\n", body)
+	bodystr := string(body)
+
+	if bodystr == "started" {
+		// Service started forward request
 		e.next.ServeHTTP(rw, req)
-		return
+	} else if bodystr == "starting" {
+		// Service starting, notify client
+		rw.Write([]byte("Service is starting..."))
+	} else {
+		// Error
+		rw.Write(body)
 	}
-	fmt.Printf("%+v\n", serviceResponse)
-	e.next.ServeHTTP(rw, req)
 }
