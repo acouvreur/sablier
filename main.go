@@ -25,12 +25,12 @@ func handleRequests(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%+v", "Could not connect to docker API")
 	}
 	service := GetOrCreateService(serviceName, serviceTimeout)
-	err = service.HandleServiceState(cli)
+	status, err := service.HandleServiceState(cli)
 	if err != nil {
 		fmt.Printf("Error: %+v\n ", err)
 		fmt.Fprintf(w, "%+v", err)
 	}
-	fmt.Fprintf(w, "%+v", service)
+	fmt.Fprintf(w, "%+s", status)
 
 }
 
@@ -93,10 +93,10 @@ func GetOrCreateService(name string, timeout uint64) *Service {
 }
 
 // HandleServiceState up the service if down or set timeout for downing the service
-func (service *Service) HandleServiceState(cli *client.Client) error {
+func (service *Service) HandleServiceState(cli *client.Client) (string, error) {
 	status, err := service.getStatus(cli)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if status == UP {
 		fmt.Printf("- Service %v is up\n", service.name)
@@ -104,23 +104,25 @@ func (service *Service) HandleServiceState(cli *client.Client) error {
 			go service.stopAfterTimeout(cli)
 		}
 		service.time <- service.timeout
+		return "started", nil
 	} else if status == STARTING {
 		fmt.Printf("- Service %v is starting\n", service.name)
 		if err != nil {
-			return err
+			return "", err
 		}
 		go service.stopAfterTimeout(cli)
+		return "starting", nil
 	} else if status == DOWN {
 		fmt.Printf("- Service %v is down\n", service.name)
 		service.start(cli)
+		return "starting", nil
 	} else {
 		fmt.Printf("- Service %v status is unknown\n", service.name)
 		if err != nil {
-			return err
+			return "", err
 		}
-		service.HandleServiceState(cli)
+		return service.HandleServiceState(cli)
 	}
-	return nil
 }
 
 func (service *Service) getStatus(client *client.Client) (Status, error) {
