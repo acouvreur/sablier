@@ -6,6 +6,7 @@ import: github.com/acouvreur/traefik-ondemand-plugin
 summary: 'Scale swarm services on demand when requested'
 
 testData:
-  serviceUrl: 'http://google.com'
-  timeoutSeconds: 5 
+  serviceUrl: http://ondemand:10000
+  name: TRAEFIK_HACKATHON_whoami
+  timeout: 60
   
