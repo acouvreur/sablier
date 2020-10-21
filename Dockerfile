@@ -4,3 +4,4 @@ COPY . .
 RUN go build -o ondemand-service .
 FROM scratch AS bin
 COPY --from=build /src/ondemand-service /
+ENTRYPOINT [ "/ondemand-service" ]
