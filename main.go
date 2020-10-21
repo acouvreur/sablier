@@ -19,9 +19,25 @@ const oneReplica = uint64(1)
 const zeroReplica = uint64(0)
 
 func handleRequests(w http.ResponseWriter, r *http.Request) {
+	serviceName, serviceTimeout := parseParams(w, r)
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		fmt.Fprintf(w, "%+v", "Could not connect to docker API")
+	}
+	service := GetOrCreateService(serviceName, serviceTimeout)
+	err = service.HandleServiceState(cli)
+	if err != nil {
+		fmt.Printf("Error: %+v ", err)
+		fmt.Fprintf(w, "%+v", err)
+	}
+	fmt.Printf("Service after query: %+v\n", service)
+	fmt.Fprintf(w, "%+v", service)
 
+}
+
+func parseParams(w http.ResponseWriter, r *http.Request) (string, uint64) {
 	queryParams := r.URL.Query()
-	fmt.Printf("%+v\n", queryParams)
+
 	if queryParams["name"] == nil {
 		http.Error(w, "name is required", 400)
 		fmt.Fprintf(w, "%+v", "name is required")
@@ -31,32 +47,12 @@ func handleRequests(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "timeout is required", 400)
 		fmt.Fprintf(w, "%+v", "name is required")
 	}
+
 	serviceTimeout, err := strconv.Atoi(queryParams["timeout"][0])
 	if err != nil {
 		fmt.Fprintf(w, "%+v", "timeout must be an integer.")
 	}
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		fmt.Fprintf(w, "%+v", "Could not connect to docker API")
-	}
-	// 1. Check if service is up
-	// 2.
-	// IS DOWN
-	// 2.1 Start the service if down (async)
-	// 2.2 Set timeout
-	// IS UP
-	// 2.1 Reset timeout
-	// 3. Response
-
-	service := GetOrCreateService(serviceName, uint64(serviceTimeout))
-	err = service.HandleServiceState(cli)
-	if err != nil {
-		fmt.Printf("Error: %+v ", err)
-		fmt.Fprintf(w, "%+v", err)
-	}
-	fmt.Printf("%+v\n", service)
-	fmt.Fprintf(w, "%+v", service)
-
+	return serviceName, uint64(serviceTimeout)
 }
 
 func main() {
@@ -64,7 +60,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
 
-/// Other file
+// ===  Other file ===
 
 // Status is the service status
 type Status string
@@ -101,10 +97,10 @@ func (service *Service) HandleServiceState(cli *client.Client) error {
 	if service.isUp() == true {
 		fmt.Printf("- Service %v is up\n", service.name)
 		service.timeout = service.initialTimeout
-
+		go service.stopAfterTimeout(cli)
 	} else if service.isDown() {
 		fmt.Printf("- Service %v is down\n", service.name)
-		service.start()
+		service.start(cli)
 	} else {
 		fmt.Printf("- Service %v status is unknown\n", service.name)
 		err := service.setServiceStateFromDocker(cli)
@@ -126,6 +122,53 @@ func (service *Service) isDown() bool {
 
 func (service *Service) setServiceStateFromDocker(client *client.Client) error {
 	ctx := context.Background()
+	dockerService, err := service.getDockerService(ctx, client)
+
+	if err != nil {
+		return err
+	}
+
+	status := UP
+	if dockerService.Spec.Mode.Replicated.Replicas == create(0) {
+		status = DOWN
+	}
+	service.status = status
+	return nil
+}
+
+func (service *Service) start(client *client.Client) {
+	fmt.Printf("Starting service %s", service.name)
+	service.setServiceReplicas(client, 1)
+	service.timeout = service.initialTimeout
+	go service.stopAfterTimeout(client)
+}
+
+func (service *Service) stopAfterTimeout(client *client.Client) {
+	for service.timeout > 0 {
+		time.Sleep(1 * time.Second)
+		service.timeout--
+	}
+	fmt.Printf("Stopping service %s", service.name)
+	service.setServiceReplicas(client, 0)
+}
+
+func (service *Service) setServiceReplicas(client *client.Client, replicas uint64) error {
+	ctx := context.Background()
+	dockerService, err := service.getDockerService(ctx, client)
+
+	swarmCluster, err := client.SwarmInspect(ctx)
+	if err != nil {
+		return err
+	}
+	dockerService.Spec.Mode.Replicated = &swarm.ReplicatedService{
+		Replicas: create(replicas),
+	}
+	client.ServiceUpdate(ctx, dockerService.ID, swarmCluster.ClusterInfo.Version, dockerService.Spec, types.ServiceUpdateOptions{})
+	return nil
+
+}
+
+func (service *Service) getDockerService(ctx context.Context, client *client.Client) (*swarm.Service, error) {
 	filterOPt := opts.NewFilterOpt()
 	listOpts := types.ServiceListOptions{
 		Filters: filterOPt.Value(),
@@ -133,31 +176,16 @@ func (service *Service) setServiceStateFromDocker(client *client.Client) error {
 	services, err := client.ServiceList(ctx, listOpts)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	dockerService, err := findService(services, service.name)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	fmt.Printf("%+v\n", dockerService)
-
-	dockerService.Spec.Mode.Replicated = &swarm.ReplicatedService{
-		Replicas: create(oneReplica),
-	}
-
-	swarmCluster, err := client.SwarmInspect(ctx)
-	if err != nil {
-		return err
-	}
-
-	client.ServiceUpdate(ctx, dockerService.ID, swarmCluster.ClusterInfo.Version, dockerService.Spec, types.ServiceUpdateOptions{})
-
-	status := UP
-	service.status = status
-	return nil
+	return dockerService, nil
 }
 
 func findService(services []swarm.Service, name string) (*swarm.Service, error) {
@@ -167,36 +195,6 @@ func findService(services []swarm.Service, name string) (*swarm.Service, error) 
 		}
 	}
 	return &swarm.Service{}, fmt.Errorf("Could not find service %s", name)
-}
-
-func (service *Service) start() {
-	// start service in docker
-	service.timeout = service.initialTimeout
-	go service.stopAfterTimeout()
-}
-
-func (service *Service) stopAfterTimeout() {
-	for service.timeout > 0 {
-		time.Sleep(100 * time.Millisecond)
-	}
-	// TODO :: stop the service
-}
-
-func (service *Service) setServiceReplicas(client *client.Client) error {
-	ctx := context.Background()
-	filterOPt := opts.NewFilterOpt()
-	listOpts := types.ServiceListOptions{
-		Filters: filterOPt.Value(),
-	}
-	services, err := client.ServiceList(ctx, listOpts)
-	if err != nil {
-		return fmt.Errorf("Error: %+v", err)
-	}
-
-	fmt.Printf("%+v", services)
-
-	return nil
-
 }
 
 func create(x uint64) *uint64 {
