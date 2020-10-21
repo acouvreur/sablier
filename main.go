@@ -27,7 +27,7 @@ func handleRequests(w http.ResponseWriter, r *http.Request) {
 	service := GetOrCreateService(serviceName, serviceTimeout)
 	err = service.HandleServiceState(cli)
 	if err != nil {
-		fmt.Printf("Error: %+v ", err)
+		fmt.Printf("Error: %+v\n ", err)
 		fmt.Fprintf(w, "%+v", err)
 	}
 	fmt.Printf("Service after query: %+v\n", service)
@@ -129,7 +129,8 @@ func (service *Service) setServiceStateFromDocker(client *client.Client) error {
 	}
 
 	status := UP
-	if dockerService.Spec.Mode.Replicated.Replicas == create(0) {
+	fmt.Printf("replicas %d\n", dockerService.Spec.Mode.Replicated.Replicas)
+	if *dockerService.Spec.Mode.Replicated.Replicas == zeroReplica {
 		status = DOWN
 	}
 	service.status = status
@@ -137,7 +138,7 @@ func (service *Service) setServiceStateFromDocker(client *client.Client) error {
 }
 
 func (service *Service) start(client *client.Client) {
-	fmt.Printf("Starting service %s", service.name)
+	fmt.Printf("Starting service %s\n", service.name)
 	service.setServiceReplicas(client, 1)
 	service.timeout = service.initialTimeout
 	go service.stopAfterTimeout(client)
@@ -148,22 +149,20 @@ func (service *Service) stopAfterTimeout(client *client.Client) {
 		time.Sleep(1 * time.Second)
 		service.timeout--
 	}
-	fmt.Printf("Stopping service %s", service.name)
+	fmt.Printf("Stopping service %s\n", service.name)
 	service.setServiceReplicas(client, 0)
 }
 
 func (service *Service) setServiceReplicas(client *client.Client, replicas uint64) error {
 	ctx := context.Background()
 	dockerService, err := service.getDockerService(ctx, client)
-
-	swarmCluster, err := client.SwarmInspect(ctx)
 	if err != nil {
 		return err
 	}
 	dockerService.Spec.Mode.Replicated = &swarm.ReplicatedService{
 		Replicas: create(replicas),
 	}
-	client.ServiceUpdate(ctx, dockerService.ID, swarmCluster.ClusterInfo.Version, dockerService.Spec, types.ServiceUpdateOptions{})
+	client.ServiceUpdate(ctx, dockerService.ID, dockerService.Meta.Version, dockerService.Spec, types.ServiceUpdateOptions{})
 	return nil
 
 }
