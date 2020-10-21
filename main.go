@@ -18,20 +18,41 @@ import (
 const oneReplica = uint64(1)
 const zeroReplica = uint64(0)
 
-func handleRequests(w http.ResponseWriter, r *http.Request) {
-	serviceName, serviceTimeout := parseParams(w, r)
+// Status is the service status
+type Status string
+
+const (
+	UP       Status = "up"
+	DOWN     Status = "down"
+	STARTING Status = "starting"
+	UNKNOWN  Status = "unknown"
+)
+
+// Service holds all information related to a service
+type Service struct {
+	name      string
+	timeout   uint64
+	time      chan uint64
+	isHandled bool
+}
+
+var services = map[string]*Service{}
+
+func handleRequests() func(w http.ResponseWriter, r *http.Request) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		fmt.Fprintf(w, "%+v", "Could not connect to docker API")
+		log.Fatal(fmt.Errorf("%+v", "Could not connect to docker API"))
 	}
-	service := GetOrCreateService(serviceName, serviceTimeout)
-	status, err := service.HandleServiceState(cli)
-	if err != nil {
-		fmt.Printf("Error: %+v\n ", err)
-		fmt.Fprintf(w, "%+v", err)
+	return func(w http.ResponseWriter, r *http.Request) {
+		serviceName, serviceTimeout := parseParams(w, r)
+		service := GetOrCreateService(serviceName, serviceTimeout)
+		status, err := service.HandleServiceState(cli)
+		if err != nil {
+			fmt.Printf("Error: %+v\n ", err)
+			fmt.Fprintf(w, "%+v", err)
+		}
+		fmt.Fprintf(w, "%+s", status)
 	}
-	fmt.Fprintf(w, "%+s", status)
-
 }
 
 func parseParams(w http.ResponseWriter, r *http.Request) (string, uint64) {
@@ -56,31 +77,9 @@ func parseParams(w http.ResponseWriter, r *http.Request) (string, uint64) {
 
 func main() {
 	fmt.Println("Server listening on port 10000.")
-	http.HandleFunc("/", handleRequests)
+	http.HandleFunc("/", handleRequests())
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
-
-// ===  Other file ===
-
-// Status is the service status
-type Status string
-
-const (
-	UP       Status = "up"
-	DOWN     Status = "down"
-	STARTING Status = "starting"
-	UNKNOWN  Status = "unknown"
-)
-
-// Service holds all information related to a service
-type Service struct {
-	name      string
-	timeout   uint64
-	time      chan uint64
-	isHandled bool
-}
-
-var services = map[string]*Service{}
 
 // GetOrCreateService return an existing service or create one
 func GetOrCreateService(name string, timeout uint64) *Service {
