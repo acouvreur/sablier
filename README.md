@@ -11,15 +11,15 @@ It will scale back to 1 when there is a user requesting the service.
 
 ## Configuration
 
-- `serviceUrl` the traefik-ondemand-service url
-- `dockerServiceName` the service to sclae on demand name (docker service ls)
-- `timeoutSeconds` timeout in seconds for the service to be scaled down to zero after the last request
+- `serviceUrl` the traefik-ondemand-service url (e.g. http://ondemand:1000)
+- `name` the service to sclae on demand name (docker service ls)
+- *`timeout` (default: 60)* timeout in seconds for the service to be scaled down to zero after the last request
 
-See `config.yml` and docker-compose.yml for full configuration.
+See `config.yml` and `docker-compose.yml` for full configuration.
 
 ## Demo
 
-The service whoami is scaled to 0. We configured a timeout of 10 seconds.
+The service **whoami** is scaled to 0. We configured a **timeout of 10** seconds.
 
 ![Demo](./img/demo.gif)
 
@@ -39,7 +39,7 @@ Otherwise when scaling to 0 the specification would not be found because there i
 
 ### The need of "traefik-ondemand-service"
 
-This is a small project developped to interact freely with the docker deamon and manage an independant lifecycle.
+We are running "traefik-ondemand-service" to interact freely with the docker deamon and manage an independant lifecycle from traefik.
 
 *We may try to update this plugin to embed the scaling behavior in a future.*
 

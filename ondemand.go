@@ -7,45 +7,49 @@ import (
 	"net/http"
 )
 
-const defaultTimeoutSeconds = 10
+const defaultTimeoutSeconds = 60
 
 // Config the plugin configuration
 type Config struct {
-	DockerServiceName string
-	ServiceUrl        string
-	TimeoutSeconds    uint64
+	Name       string
+	ServiceUrl string
+	Timeout    uint64
 }
 
 func CreateConfig() *Config {
 	return &Config{
-		TimeoutSeconds: defaultTimeoutSeconds,
+		Timeout: defaultTimeoutSeconds,
 	}
 }
 
 type Ondemand struct {
 	next              http.Handler
 	name              string
-	ServiceUrl        string
-	TimeoutSeconds    uint64
-	DockerServiceName string
+	serviceUrl        string
+	timeoutSeconds    uint64
+	dockerServiceName string
 }
 
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 	if len(config.ServiceUrl) == 0 {
-		return nil, fmt.Errorf("ServiceUrl cannot be null")
+		return nil, fmt.Errorf("serviceUrl cannot be null")
+	}
+
+	if len(config.Name) == 0 {
+		return nil, fmt.Errorf("name cannot be null")
 	}
 
 	return &Ondemand{
 		next:              next,
 		name:              name,
-		ServiceUrl:        config.ServiceUrl,
-		DockerServiceName: config.DockerServiceName,
-		TimeoutSeconds:    config.TimeoutSeconds,
+		serviceUrl:        config.ServiceUrl,
+		dockerServiceName: config.Name,
+		timeoutSeconds:    config.Timeout,
 	}, nil
 }
 
 func (e *Ondemand) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	url := fmt.Sprintf("%s/?name=%s&timeout=%d", e.ServiceUrl, e.DockerServiceName, e.TimeoutSeconds)
+	url := fmt.Sprintf("%s/?name=%s&timeout=%d", e.serviceUrl, e.dockerServiceName, e.timeoutSeconds)
 	resp, err := http.Get(url)
 	if err != nil {
 		println("Could not contact", url)

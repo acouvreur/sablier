@@ -1,10 +1,11 @@
 http:
   middlewares:
-    ondemand:
+    ondemand-60:
       plugin:
         dev:
           serviceUrl: http://ondemand:10000
-          dockerServiceName: TRAEFIK_HACKATHON_whoami
+          name: TRAEFIK_HACKATHON_whoami
+          timeout: 60
 
   services:
     whoami:
@@ -18,5 +19,5 @@ http:
       entryPoints:
         - "http"
       middlewares:
-        - ondemand
+        - ondemand-60
       service: "whoami"
