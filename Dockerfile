@@ -3,4 +3,4 @@ WORKDIR /src
 COPY . .
 RUN go build -o ondemand-service .
 FROM scratch AS bin
-COPY --from=build ondemand-service /
+COPY --from=build /src/ondemand-service /
