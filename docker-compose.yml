@@ -8,10 +8,10 @@ services:
       - "8000:80"
       - "8080:8080"
     volumes:
-      - './traefik.yml:/etc/traefik/traefik-template.yml'
+      - './traefik_dev.yml:/etc/traefik/traefik-template.yml'
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '.:/plugins/go/src/github.com/acouvreur/traefik-ondemand-plugin'
-      - './config.yml:/etc/traefik/config.yml'
+      - './config_dev.yml:/etc/traefik/config.yml'
     environment:
       - TRAEFIK_PILOT_TOKEN
     deploy:
