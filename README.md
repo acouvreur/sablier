@@ -30,7 +30,7 @@ The service **whoami** is scaled to 0. We configured a **timeout of 10** seconds
 ## Configuration
 
 - `serviceUrl` the traefik-ondemand-service url (e.g. http://ondemand:1000)
-- `name` the service to sclae on demand name (docker service ls)
+- `name` the service to scale on demand name (docker service ls)
 - *`timeout` (default: 60)* timeout in seconds for the service to be scaled down to zero after the last request
 
 See `config.yml` and `docker-compose.yml` for full configuration.
