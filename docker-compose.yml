@@ -26,3 +26,5 @@ services:
 
   whoami:
     image: containous/whoami
+    deploy:
+      replicas: 0
