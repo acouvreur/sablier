@@ -51,6 +51,7 @@ We are running "traefik-ondemand-service" to interact freely with the docker dea
 - [ ] Scale **up** service (max replica, threshold)
 - [ ] Scale down from N to 1 (threshold)
 - [ ] Kubernetes integration
+- [ ] Add configuration sample with plugin in non dev mode
 
 ## Authors
 
