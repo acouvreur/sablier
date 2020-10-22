@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -38,13 +39,22 @@ type Service struct {
 
 var services = map[string]*Service{}
 
+func main() {
+	fmt.Println("Server listening on port 10000.")
+	http.HandleFunc("/", handleRequests())
+	log.Fatal(http.ListenAndServe(":10000", nil))
+}
+
 func handleRequests() func(w http.ResponseWriter, r *http.Request) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		log.Fatal(fmt.Errorf("%+v", "Could not connect to docker API"))
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		serviceName, serviceTimeout := parseParams(w, r)
+		serviceName, serviceTimeout, err := parseParams(r)
+		if err != nil {
+			fmt.Fprintf(w, "%+v", err)
+		}
 		service := GetOrCreateService(serviceName, serviceTimeout)
 		status, err := service.HandleServiceState(cli)
 		if err != nil {
@@ -55,30 +65,30 @@ func handleRequests() func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func parseParams(w http.ResponseWriter, r *http.Request) (string, uint64) {
-	queryParams := r.URL.Query()
-
-	if queryParams["name"] == nil {
-		http.Error(w, "name is required", 400)
-		fmt.Fprintf(w, "%+v", "name is required")
+func getParam(queryParams url.Values, paramName string) (string, error) {
+	if queryParams[paramName] == nil {
+		return "", fmt.Errorf("%s is required", paramName)
 	}
-	serviceName := string(queryParams["name"][0])
-	if queryParams["timeout"] == nil {
-		http.Error(w, "timeout is required", 400)
-		fmt.Fprintf(w, "%+v", "name is required")
-	}
-
-	serviceTimeout, err := strconv.Atoi(queryParams["timeout"][0])
-	if err != nil {
-		fmt.Fprintf(w, "%+v", "timeout must be an integer.")
-	}
-	return serviceName, uint64(serviceTimeout)
+	return queryParams[paramName][0], nil
 }
 
-func main() {
-	fmt.Println("Server listening on port 10000.")
-	http.HandleFunc("/", handleRequests())
-	log.Fatal(http.ListenAndServe(":10000", nil))
+func parseParams(r *http.Request) (string, uint64, error) {
+	queryParams := r.URL.Query()
+
+	serviceName, err := getParam(queryParams, "name")
+	if err != nil {
+		return "", 0, nil
+	}
+
+	timeoutString, err := getParam(queryParams, "timeout")
+	if err != nil {
+		return "", 0, nil
+	}
+	serviceTimeout, err := strconv.Atoi(timeoutString)
+	if err != nil {
+		return "", 0, fmt.Errorf("timeout should be an integer")
+	}
+	return serviceName, uint64(serviceTimeout), nil
 }
 
 // GetOrCreateService return an existing service or create one
