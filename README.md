@@ -9,14 +9,6 @@ A container may be a simple nginx server serving static pages, when no one is us
 With this plugin you can scale down to zero when there is no request for the service.
 It will scale back to 1 when there is a user requesting the service.
 
-## Configuration
-
-- `serviceUrl` the traefik-ondemand-service url (e.g. http://ondemand:1000)
-- `name` the service to sclae on demand name (docker service ls)
-- *`timeout` (default: 60)* timeout in seconds for the service to be scaled down to zero after the last request
-
-See `config.yml` and `docker-compose.yml` for full configuration.
-
 ## Demo
 
 The service **whoami** is scaled to 0. We configured a **timeout of 10** seconds.
@@ -25,9 +17,23 @@ The service **whoami** is scaled to 0. We configured a **timeout of 10** seconds
 
 ## Run the demo
 
-- `docker swarm init`
-- `export TRAEFIK_PILOT_TOKEN=your_traefik_pilot_token`
-- `docker stack deploy -c docker-compose.yml TRAEFIK_HACKATHON`
+*use `watch -n 1 docker service ls` to see in real time the service getting downscaled*
+
+1. `docker swarm init`
+2. `export TRAEFIK_PILOT_TOKEN=your_traefik_pilot_token`
+3. `docker stack deploy -c docker-compose.yml TRAEFIK_HACKATHON`
+4. Go to `localhost:8000/whoami` --> service is starting
+5. Refresh --> service is responding
+6. wait 10 seconds
+7. Refresh --> service is starting again because it was scaled down to 0
+
+## Configuration
+
+- `serviceUrl` the traefik-ondemand-service url (e.g. http://ondemand:1000)
+- `name` the service to sclae on demand name (docker service ls)
+- *`timeout` (default: 60)* timeout in seconds for the service to be scaled down to zero after the last request
+
+See `config.yml` and `docker-compose.yml` for full configuration.
 
 ## Limitations
 
