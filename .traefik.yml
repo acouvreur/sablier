@@ -1,9 +1,9 @@
-displayName: ondemand traefik plugin
+displayName: Containers On Demand
 type: middleware
 
 import: github.com/acouvreur/traefik-ondemand-plugin
 
-summary: 'Scale swarm services on demand when requested'
+summary: 'Scale swarm services down to zero after a timeout and bring them back up on demand'
 
 testData:
   serviceUrl: http://ondemand:10000
