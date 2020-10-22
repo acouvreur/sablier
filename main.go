@@ -23,10 +23,14 @@ const zeroReplica = uint64(0)
 type Status string
 
 const (
-	UP       Status = "up"
-	DOWN     Status = "down"
+	// UP represents a service that is running (with at least a container running)
+	UP Status = "up"
+	// DOWN represents a service that is not running (with 0 container running)
+	DOWN Status = "down"
+	// STARTING represents a service that is starting (with at least a container starting)
 	STARTING Status = "starting"
-	UNKNOWN  Status = "unknown"
+	// UNKNOWN represents a service for which the docker status is not know
+	UNKNOWN Status = "unknown"
 )
 
 // Service holds all information related to a service
@@ -185,7 +189,7 @@ func (service *Service) setServiceReplicas(client *client.Client, replicas uint6
 		return err
 	}
 	dockerService.Spec.Mode.Replicated = &swarm.ReplicatedService{
-		Replicas: create(replicas),
+		Replicas: getPointer(replicas),
 	}
 	client.ServiceUpdate(ctx, dockerService.ID, dockerService.Meta.Version, dockerService.Spec, types.ServiceUpdateOptions{})
 	return nil
@@ -221,6 +225,6 @@ func findService(services []swarm.Service, name string) (*swarm.Service, error) 
 	return &swarm.Service{}, fmt.Errorf("Could not find service %s", name)
 }
 
-func create(x uint64) *uint64 {
+func getPointer(x uint64) *uint64 {
 	return &x
 }
