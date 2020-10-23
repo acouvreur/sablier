@@ -1,3 +1,5 @@
+![Github Actions](https://github.com/acouvreur/traefik-ondemand-plugin/workflows/Go/badge.svg)
+
 # Traefik Ondemand Plugin
 
 Traefik plugin to scale down to zero containers on docker swarm.
