@@ -75,25 +75,20 @@ func (e *Ondemand) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	status, err := getServiceStatus(e.request)
 
-	println(status, err == nil)
-
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte(err.Error()))
 	}
 
 	if status == "started" {
-		println("Started !")
 		// Service started forward request
 		e.next.ServeHTTP(rw, req)
 
 	} else if status == "starting" {
-		println("Starting !")
 		// Service starting, notify client
 		rw.WriteHeader(http.StatusAccepted)
 		rw.Write([]byte("Service is starting..."))
 	} else {
-		println("Error :() !")
 		// Error
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte("Unexpected status answer from ondemand service"))
@@ -103,7 +98,6 @@ func (e *Ondemand) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 func getServiceStatus(request string) (string, error) {
 
 	// This request wakes up the service if he's scaled to 0
-	println(request)
 	resp, err := netClient.Get(request)
 	if err != nil {
 		return "error", err
