@@ -33,14 +33,14 @@ func TestOndemand_ServeHTTP(t *testing.T) {
 			status:      "starting",
 			scaler:      ScalerMock{isUp: false},
 			statusCode:  http.StatusAccepted,
-			contentType: "application/json",
+			contentType: "text/plain",
 		},
 		{
 			desc:        "service is started",
 			status:      "started",
 			scaler:      ScalerMock{isUp: true},
 			statusCode:  http.StatusCreated,
-			contentType: "application/json",
+			contentType: "text/plain",
 		},
 	}
 

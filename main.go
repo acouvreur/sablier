@@ -123,7 +123,7 @@ func ServeHTTPInternalError(rw http.ResponseWriter, err error) {
 }
 
 func ServeHTTPRequestState(rw http.ResponseWriter, requestState OnDemandRequestState) {
-	rw.Header().Set("Content-Type", "application/json")
+	rw.Header().Set("Content-Type", "text/plain")
 	if requestState.State == "started" {
 		rw.WriteHeader(http.StatusCreated)
 	} else {
