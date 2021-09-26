@@ -14,7 +14,7 @@ import (
 type DockerSwarmScaler struct{}
 
 func (DockerSwarmScaler) ScaleUp(client *client.Client, name string, replicas *uint64) {
-	log.Infof("Scaling up %s to %d", name, *replicas)
+	log.Infof("scaling up %s to %d", name, *replicas)
 	ctx := context.Background()
 	service, err := GetServiceByName(client, name, ctx)
 
@@ -34,25 +34,34 @@ func (DockerSwarmScaler) ScaleUp(client *client.Client, name string, replicas *u
 	}
 
 	if len(response.Warnings) > 0 {
-		fmt.Printf("Warnings received scaling up service %s: %v", name, response.Warnings)
+		log.Warnf("received scaling up service %s: %v", name, response.Warnings)
 	}
 }
 
 func (DockerSwarmScaler) ScaleDown(client *client.Client, name string) {
-	log.Infof("Scaling down %s to 0", name)
+	log.Infof("scaling down %s to 0", name)
 	ctx := context.Background()
-	container, err := GetContainerByName(client, name, ctx)
+	service, err := GetServiceByName(client, name, ctx)
 
 	if err != nil {
 		log.Error(err.Error())
 		return
 	}
 
-	err = client.ContainerStop(ctx, container.ID, nil)
+	replicas := uint64(0)
+
+	service.Spec.Mode.Replicated = &swarm.ReplicatedService{
+		Replicas: &replicas,
+	}
+	response, err := client.ServiceUpdate(ctx, service.ID, service.Meta.Version, service.Spec, types.ServiceUpdateOptions{})
 
 	if err != nil {
 		log.Error(err.Error())
 		return
+	}
+
+	if len(response.Warnings) > 0 {
+		log.Warnf("received scaling up service %s: %v", name, response.Warnings)
 	}
 }
 
