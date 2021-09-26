@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/acouvreur/traefik-ondemand-plugin/pkg/scaler"
+	"github.com/acouvreur/traefik-ondemand-service/pkg/scaler"
 	"github.com/docker/docker/client"
 	"gopkg.in/dc0d/tinykv.v4"
 )

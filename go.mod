@@ -1,4 +1,4 @@
-module github.com/acouvreur/traefik-ondemand-plugin
+module github.com/acouvreur/traefik-ondemand-service
 
 go 1.17
 
