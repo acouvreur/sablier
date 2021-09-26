@@ -9,4 +9,6 @@ RUN go build -o /go/bin/ondemand-service
 
 FROM alpine
 COPY --from=build /go/bin/ondemand-service /go/bin/ondemand-service
-CMD [ "/go/bin/ondemand-service" ]
+
+ENTRYPOINT [ "/go/bin/ondemand-service" ]
+CMD [ "--swarmMode=true" ]
