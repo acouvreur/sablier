@@ -19,7 +19,7 @@ func (DockerSwarmScaler) ScaleUp(client *client.Client, name string, replicas *u
 	service, err := GetServiceByName(client, name, ctx)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return
 	}
 
@@ -29,7 +29,7 @@ func (DockerSwarmScaler) ScaleUp(client *client.Client, name string, replicas *u
 	response, err := client.ServiceUpdate(ctx, service.ID, service.Meta.Version, service.Spec, types.ServiceUpdateOptions{})
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return
 	}
 
@@ -44,14 +44,14 @@ func (DockerSwarmScaler) ScaleDown(client *client.Client, name string) {
 	container, err := GetContainerByName(client, name, ctx)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return
 	}
 
 	err = client.ContainerStop(ctx, container.ID, nil)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return
 	}
 }
@@ -61,7 +61,7 @@ func (DockerSwarmScaler) IsUp(client *client.Client, name string) bool {
 	service, err := GetServiceByName(client, name, ctx)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return false
 	}
 

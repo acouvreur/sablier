@@ -18,14 +18,14 @@ func (DockerClassicScaler) ScaleUp(client *client.Client, name string, replicas 
 	container, err := GetContainerByName(client, name, ctx)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return
 	}
 
 	err = client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{})
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return
 	}
 }
@@ -36,14 +36,14 @@ func (DockerClassicScaler) ScaleDown(client *client.Client, name string) {
 	container, err := GetContainerByName(client, name, ctx)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return
 	}
 
 	err = client.ContainerStop(ctx, container.ID, nil)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return
 	}
 }
@@ -53,14 +53,14 @@ func (DockerClassicScaler) IsUp(client *client.Client, name string) bool {
 	container, err := GetContainerByName(client, name, ctx)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return false
 	}
 
 	spec, err := client.ContainerInspect(ctx, container.ID)
 
 	if err != nil {
-		println(err)
+		log.Error(err.Error())
 		return false
 	}
 
