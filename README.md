@@ -25,8 +25,8 @@ testData:
 
 ## Examples
 
-- [Docker Classic](./examples/docker_classic/README.md)
-- [Docker Swarm](./examples/docker_swarm/README.md)
+- [Docker Classic](./examples/docker_classic/)
+- [Docker Swarm](./examples/docker_swarm/)
 
 ## Authors
 

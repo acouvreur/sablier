@@ -1,7 +1,7 @@
 # Docker swarm
 
-`docker swarm init`
-`docker stack deploy -c docker-compose.yml DOCKER_SWARM`
-Load `http://localhost/nginx`
-Wait 1 minute
-Service is scaled to 0/0
+1. `docker swarm init`
+2. `docker stack deploy -c docker-compose.yml DOCKER_SWARM`
+3. Load `http://localhost/nginx`
+4. Wait 1 minute
+5. Service is scaled to 0/0

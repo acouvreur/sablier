@@ -1,7 +1,7 @@
 # Docker classic
 
-`docker-compose up`
-`docker stop docker_classic_whoami_1`
-Load `http://localhost/whoami`
-Wait 1 minute
-Container is stopped
+1. `docker-compose up`
+2. `docker stop docker_classic_whoami_1`
+3. Load `http://localhost/whoami`
+4. Wait 1 minute
+5. Container is stopped
