@@ -152,13 +152,13 @@ var errorPage = `<!doctype html>
   </header>
 
   <section class="panel">
-    <h2 class="headline" id="headline">Error loading {{.name}}.</h2>
+    <h2 class="headline" id="headline">Error loading {{ .Name }}.</h2>
 
     <p class="message text" id="message">There was an error loading your instance.</p>
 
 
     <div class="support text">
-      {{.error}}
+      {{ .Error }}
     </div>
   </section>
 
@@ -171,8 +171,8 @@ var errorPage = `<!doctype html>
 </html>`
 
 type ErrorData struct {
-	name string
-	err  string
+	Name  string
+	Error string
 }
 
 func GetErrorPage(name string, e string) string {
@@ -182,8 +182,8 @@ func GetErrorPage(name string, e string) string {
 	}
 	b := bytes.Buffer{}
 	tpl.Execute(&b, ErrorData{
-		name: name,
-		err:  e,
+		Name:  name,
+		Error: e,
 	})
 	return b.String()
 }

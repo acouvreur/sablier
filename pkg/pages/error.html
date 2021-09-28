@@ -145,13 +145,13 @@
   </header>
 
   <section class="panel">
-    <h2 class="headline" id="headline">Error loading {{name}}.</h2>
+    <h2 class="headline" id="headline">Error loading {{ .Name }}.</h2>
 
     <p class="message text" id="message">There was an error loading your instance.</p>
 
 
     <div class="support text">
-      {{error}}
+      {{ .Error }}
     </div>
   </section>
 
