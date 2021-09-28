@@ -7,9 +7,9 @@ api:
 
 experimental:
   plugins:
-      traefik-ondemand-plugin:
-          moduleName: "github.com/acouvreur/traefik-ondemand-plugin"
-          version: "v0.0.2"
+    traefik-ondemand-plugin:
+      moduleName: "github.com/acouvreur/traefik-ondemand-plugin"
+      version: "v0.1.1"
 
 entryPoints:
   http:
