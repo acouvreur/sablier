@@ -8,7 +8,7 @@ services:
       - --api.insecure=true
       - --pilot.token=$TRAEFIK_PILOT_TOKEN
       - --experimental.plugins.traefik-ondemand-plugin.moduleName=github.com/acouvreur/traefik-ondemand-plugin
-      - --experimental.plugins.traefik-ondemand-plugin.version=v0.0.4
+      - --experimental.plugins.traefik-ondemand-plugin.version=v0.1.1
       - --providers.docker=true
       - --providers.file.filename=/etc/traefik/dynamic-config.yml
       - --entrypoints.http.address=:80
@@ -16,22 +16,25 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
-      - './traefik_dev.yml:/etc/traefik/traefik-template.yml'
-      - './config_dev.yml:/etc/traefik/config.yml'
+      - './dynamic-config.yml:/etc/traefik/dynamic-config.yml'
     labels:
       - traefik.enable=true
 
   ondemand:
-    image: gchr.io/acouvreur/traefik-ondemand-service:main
+    image: ghcr.io/acouvreur/traefik-ondemand-service:main
+    command: 
+      - --swarmMode=false
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
     labels:
-      - traefik.enable
-      - traefik.http.middlewares.ondemand-whoami.plugin.traefik-ondemand-plugin.name=who
-      - traefik.http.middlewares.ondemand-whoami.plugin.traefik-ondemand-plugin.serviceUrl=http://ondemand:1000
-      - traefik.http.middlewares.ondemand-whoami.plugin.traefik-ondemand-plugin.timeout=1m
+      - traefik.enable=true
+      - traefik.http.middlewares.ondemand.plugin.traefik-ondemand-plugin.name=docker_classic_whoami_1
+      - traefik.http.middlewares.ondemand.plugin.traefik-ondemand-plugin.serviceUrl=http://ondemand:10000
+      - traefik.http.middlewares.ondemand.plugin.traefik-ondemand-plugin.timeout=1m
+      - traefik.http.services.ondemand.loadbalancer.server.port=10000
 
   whoami:
     image: containous/whoami
