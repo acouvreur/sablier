@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/acouvreur/traefik-ondemand-service/pkg/scaler"
 	"github.com/docker/docker/client"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/dc0d/tinykv.v4"
 )
 
@@ -26,30 +26,38 @@ func main() {
 
 	flag.Parse()
 
-	cli, err := client.NewClientWithOpts()
-	if err != nil {
-		log.Fatal(fmt.Errorf("%+v", "Could not connect to docker API"))
-	}
-
 	dockerScaler := getDockerScaler(*swarmMode)
 
 	fmt.Printf("Server listening on port 10000, swarmMode: %t\n", *swarmMode)
-	http.HandleFunc("/", onDemand(cli, dockerScaler))
+	http.HandleFunc("/", onDemand(dockerScaler))
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
 
 func getDockerScaler(swarmMode bool) scaler.Scaler {
-	if swarmMode {
-		return scaler.DockerSwarmScaler{}
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		log.Fatal(fmt.Errorf("%+v", "Could not connect to docker API"))
 	}
-	return scaler.DockerClassicScaler{}
+	if swarmMode {
+		return &scaler.DockerSwarmScaler{
+			Client: cli,
+		}
+	}
+	return &scaler.DockerClassicScaler{
+		Client: cli,
+	}
 }
 
-func onDemand(client *client.Client, scaler scaler.Scaler) func(w http.ResponseWriter, r *http.Request) {
+func onDemand(scaler scaler.Scaler) func(w http.ResponseWriter, r *http.Request) {
 
 	store := tinykv.New(time.Second*20, func(key string, _ interface{}) {
 		// Auto scale down after timeout
-		scaler.ScaleDown(client, key)
+		err := scaler.ScaleDown(key)
+
+		if err != nil {
+			log.Warnf("error scaling down %s: %s", key, err.Error())
+		}
+
 	})
 
 	return func(rw http.ResponseWriter, r *http.Request) {
@@ -75,13 +83,11 @@ func onDemand(client *client.Client, scaler scaler.Scaler) func(w http.ResponseW
 			return
 		}
 
-		replicas := uint64(1)
-
 		requestState, exists := store.Get(name)
 
 		// 1. Check against the current state
 		if !exists || requestState.(OnDemandRequestState).State != "started" {
-			if scaler.IsUp(client, name) {
+			if scaler.IsUp(name) {
 				requestState = OnDemandRequestState{
 					State: "started",
 					Name:  name,
@@ -91,7 +97,12 @@ func onDemand(client *client.Client, scaler scaler.Scaler) func(w http.ResponseW
 					State: "starting",
 					Name:  name,
 				}
-				scaler.ScaleUp(client, name, &replicas)
+				err := scaler.ScaleUp(name)
+
+				if err != nil {
+					ServeHTTPInternalError(rw, err)
+					return
+				}
 			}
 		}
 
