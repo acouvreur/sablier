@@ -1,10 +1,30 @@
-# Traefik Ondemand Plugin
+<h1 align="center">
+  <img src="https://blog.alterway.fr/images/traefik.logo.png" alt="Traefik Ondemand Plugin" width="200">
+  <br>Traefik Ondemand Plugin<br>
+</h1>
 
-![Build](https://github.com/acouvreur/traefik-ondemand-plugin/workflows/Build/badge.svg)
+<h4 align="center">Traefik middleware to start containers on demand.</h4>
 
-Start your containers/services on the first request they recieve, and shut them down after a specified duration after the last request they received. 
+<p align="center">
+  <a href="https://github.com/acouvreur/traefik-ondemand-plugin/actions">
+    <img src="https://img.shields.io/github/workflow/status/acouvreur/traefik-ondemand-plugin/Build?style=flat-square" alt="Github Actions">
+  </a>
+  <a href="https://goreportcard.com/report/github.com/acouvreur/traefik-ondemand-plugin">
+    <img src="https://goreportcard.com/badge/github.com/acouvreur/traefik-ondemand-plugin?style=flat-square">
+  </a>
+  <img src="https://img.shields.io/github/go-mod/go-version/acouvreur/traefik-ondemand-plugin?style=flat-square">
+  <a href="https://github.com/acouvreur/traefik-ondemand-plugin/releases">
+    <img src="https://img.shields.io/github/release/acouvreur/traefik-ondemand-plugin/all.svg?style=flat-square">
+  </a>
+</p>
 
-Docker classic and docker swarm compatible.
+## Features
+
+- Support for Docker containers
+- Support for Docker swarm mode, scale services
+- Start your container/service on the first request
+- Automatic scale to zero after configured timeout upon last request the service received
+- Dynamic loading page (cloudflare or grafana cloud style)
 
 ![Demo](./img/ondemand.gif)
 ## Usage
