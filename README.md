@@ -1,13 +1,31 @@
-# Traefik on demand service
+<h1 align="center">
+  <img src="https://blog.alterway.fr/images/traefik.logo.png" alt="Traefik Ondemand Plugin" width="200">
+  <br>Traefik Ondemand Service<br>
+</h1>
 
-![Build](https://github.com/acouvreur/traefik-ondemand-service/workflows/Build/badge.svg)
-![Latest version](https://img.shields.io/github/v/tag/acouvreur/traefik-ondemand-service?sort=semver)
+<h4 align="center">Traefik Ondemand Service for <a href="https://github.com/acouvreur/traefik-ondemand-plugin">traefik-ondemand-plugin</a> to control containers and services.</h4>
 
-## Description
+<p align="center">
+  <a href="https://github.com/acouvreur/traefik-ondemand-service/actions">
+    <img src="https://img.shields.io/github/workflow/status/acouvreur/traefik-ondemand-service/Build?style=flat-square" alt="Github Actions">
+  </a>
+  <a href="https://goreportcard.com/report/github.com/acouvreur/traefik-ondemand-service">
+    <img src="https://goreportcard.com/badge/github.com/acouvreur/traefik-ondemand-service?style=flat-square">
+  </a>
+  <img src="https://img.shields.io/github/go-mod/go-version/acouvreur/traefik-ondemand-service?style=flat-square">
+  <a href="https://github.com/acouvreur/traefik-ondemand-service/releases">
+    <img src="https://img.shields.io/github/release/acouvreur/traefik-ondemand-service/all.svg?style=flat-square">
+  </a>
+</p>
 
-This is a service that can scale up or down a docker swarm service on demand.
-It basically starts a service when it's needed and then shut it down when it's no longer needed.
+## Features
 
+- Support for Docker containers
+- Support for Docker swarm mode, scale services
+- Start your container/service on the first request
+- Dynamic loading page (cloudflare or grafana cloud style)
+- Automatic scale to zero after configured timeout upon last request the service received
+- Support container/service healthcheck and will not redirect until service is healthy
 ## Usage
 
 ### CLI
