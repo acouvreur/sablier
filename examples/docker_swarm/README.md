@@ -1,7 +1,12 @@
 # Docker swarm
 
-1. `docker swarm init`
-2. `docker stack deploy -c docker-stack.yml DOCKER_SWARM`
-3. Load `http://localhost/nginx`
-4. Wait 1 minute
-5. Service is scaled to 0/0
+## Run the demo
+
+1. `git clone git@github.com:acouvreur/traefik-ondemand-plugin.git`
+2. `cd traefik-ondemand-plugin/examples/docker_swarm`
+3. `docker swarm init`
+4. `export TRAEFIK_PILOT_TOKEN=...`
+5.  `docker stack deploy -c docker-stack.yml DOCKER_SWARM`
+6.  Load `http://localhost/nginx`
+7.  Wait 1 minute
+8.  Service is scaled to 0/0
