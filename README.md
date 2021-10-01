@@ -1,30 +1,21 @@
-<h1 align="center">
-  <img src="./img/traefik.png" alt="Traefik Ondemand Plugin" width="200">
-  <br>Traefik Ondemand Plugin<br>
-</h1>
 
-<h4 align="center">Traefik middleware to start containers on demand.</h4>
+# Traefik Ondemand Plugin
 
-<p align="center">
-  <a href="https://github.com/acouvreur/traefik-ondemand-plugin/actions">
-    <img src="https://img.shields.io/github/workflow/status/acouvreur/traefik-ondemand-plugin/Build?style=flat-square" alt="Github Actions">
-  </a>
-  <a href="https://goreportcard.com/report/github.com/acouvreur/traefik-ondemand-plugin">
-    <img src="https://goreportcard.com/badge/github.com/acouvreur/traefik-ondemand-plugin?style=flat-square">
-  </a>
-  <img src="https://img.shields.io/github/go-mod/go-version/acouvreur/traefik-ondemand-plugin?style=flat-square">
-  <a href="https://github.com/acouvreur/traefik-ondemand-plugin/releases">
-    <img src="https://img.shields.io/github/release/acouvreur/traefik-ondemand-plugin/all.svg?style=flat-square">
-  </a>
-</p>
+
+Traefik middleware to start containers on demand.
+
+![Github Actions](https://img.shields.io/github/workflow/status/acouvreur/traefik-ondemand-plugin/Build?style=flat-square)
+![Go Report](https://goreportcard.com/badge/github.com/acouvreur/traefik-ondemand-plugin?style=flat-square)
+![Go Version](https://img.shields.io/github/go-mod/go-version/acouvreur/traefik-ondemand-plugin?style=flat-square)
+![Latest Release](https://img.shields.io/github/release/acouvreur/traefik-ondemand-plugin/all.svg?style=flat-square)
 
 ## Features
 
-- Support for Docker containers
-- Support for Docker swarm mode, scale services
-- Support for Kubernetes Deployments
+- Support for **Docker** containers
+- Support for **Docker swarm** mode, scale services
+- Support for **Kubernetes** Deployments
 - Start your container/service on the first request
-- Automatic scale to zero after configured timeout upon last request the service received
+- Automatic **scale to zero** after configured timeout upon last request the service received
 - Dynamic loading page (cloudflare or grafana cloud style)
 
 ![Demo](./img/ondemand.gif)
