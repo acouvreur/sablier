@@ -24,7 +24,7 @@ services:
       - traefik.enable=true
 
   ondemand:
-    image: ghcr.io/acouvreur/traefik-ondemand-service:main
+    image: ghcr.io/acouvreur/traefik-ondemand-service:1.5.0
     command: 
       - --swarmMode=false
     volumes:
