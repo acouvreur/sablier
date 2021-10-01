@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://blog.alterway.fr/images/traefik.logo.png" alt="Traefik Ondemand Plugin" width="200">
+  <img src="./img/traefik.png" alt="Traefik Ondemand Plugin" width="200">
   <br>Traefik Ondemand Plugin<br>
 </h1>
 
