@@ -19,7 +19,7 @@ spec:
       serviceAccount: traefik-ondemand-service
       containers:
       - name: traefik-ondemand-service
-        image: ghcr.io/acouvreur/traefik-ondemand-service:1.5.0
+        image: ghcr.io/acouvreur/traefik-ondemand-service:1
         args: ["--swarmMode=false", "--kubernetesMode=true"]
         ports:
         - containerPort: 10000
