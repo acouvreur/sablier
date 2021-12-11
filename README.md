@@ -1,6 +1,4 @@
-
 # Traefik Ondemand Plugin
-
 
 Traefik middleware to start containers on demand.
 
@@ -17,15 +15,35 @@ Traefik middleware to start containers on demand.
 - Start your container/service on the first request
 - Automatic **scale to zero** after configured timeout upon last request the service received
 - Dynamic loading page (cloudflare or grafana cloud style)
+- Customize dynamic and loading pages
 
 ![Demo](./img/ondemand.gif)
+
 ## Usage
 
 ### Plugin configuration
 
+#### Strategies
+
+**Dynamic Strategy**
+
+_Serve an HTML page that self reload._
+
+```yml
+testData:
+  serviceUrl: http://ondemand:10000
+  name: TRAEFIK_HACKATHON_whoami
+  timeout: 1m
+  waitUi: true
+```
+
+**Blocking Strategy**
+
+_Responds as soon as the service is up with a maximum waiting time of `blockingDelay`_
+
 #### Custom loading/error pages
 
-The `loadingpage` and `errorpage` keys in the plugin configuration can be used to override the default loading and error pages. 
+The `loadingpage` and `errorpage` keys in the plugin configuration can be used to override the default loading and error pages.
 
 The value should be a path where a template that can be parsed by Go's [html/template](https://pkg.go.dev/html/template) package can be found in the Traefik container.
 
@@ -33,23 +51,30 @@ An example of both a loading page and an error page template can be found in the
 
 The plugin will default to the built-in loading and error pages if these fields are omitted.
 
+You must include `<meta http-equiv="refresh" content="5" />` inside your html page to get auto refresh.
+
 **Example Configuration**
+
 ```yml
 testData:
   serviceUrl: http://ondemand:10000
   name: TRAEFIK_HACKATHON_whoami
   timeout: 1m
+  waitUi: false
+  blockingDelay: 1m
   loadingpage: /opt/on-demand/loading.html
   errorpage: /opt/on-demand/error.html
 ```
 
-| Parameter    | Type            | Example                       | Description                                                             |
-| ------------ | --------------- | --------------------------    | ----------------------------------------------------------------------- |
-| `serviceUrl` | `string`        | `http://ondemand:10000`       | The docker container name, or the swarm service name                    |
-| `name`       | `string`        | `TRAEFIK_HACKATHON_whoami`    | The container/service to be stopped (docker ps                          | docker service ls) |
-| `timeout`    | `time.Duration` | `1m30s`                       | The duration after which the container/service will be scaled down to 0 |
-| `loadingpage`| `string`        | `/opt/on-demand/loading.html` | The path in the traefik container for the loading page template         |
-| `errorpage`  | `string`        | `/opt/on-demand/error.html`   | The path in the traefik container for the error page template           |
+| Parameter       | Type            | Example                       | Description                                                                           |
+| --------------- | --------------- | ----------------------------- | ------------------------------------------------------------------------------------- |
+| `serviceUrl`    | `string`        | `http://ondemand:10000`       | The docker container name, or the swarm service name                                  |
+| `name`          | `string`        | `TRAEFIK_HACKATHON_whoami`    | The container/service to be stopped (docker ps docker service ls)                     |
+| `timeout`       | `time.Duration` | `1m30s`                       | The duration after which the container/service will be scaled down to 0               |
+| `waitUi`        | `bool`          | `true`                        | Serves a self-refreshing html page when the service is scaled down to 0               |
+| `blockingDelay` | `time.Duration` | `1m30s`                       | When `waitUi` is `false`, wait for the service to be scaled up before `blockingDelay` |
+| `loadingpage`   | `string`        | `/opt/on-demand/loading.html` | The path in the traefik container for the loading page template                       |
+| `errorpage`     | `string`        | `/opt/on-demand/error.html`   | The path in the traefik container for the error page template                         |
 
 ### Traefik-Ondemand-Service
 
@@ -65,6 +90,11 @@ The docker library that interacts with the docker deamon uses `unsafe` which mus
 - [Docker Swarm](./examples/docker_swarm/)
 - [Multiple Containers](./examples/multiple_containers/)
 - [Kubernetes](./examples/kubernetes/)
+
+## Development
+
+`export TRAEFIK_PILOT_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+`docker stack deploy -c docker-compose.yml TRAEFIK_HACKATHON`
 
 ## Authors
 
