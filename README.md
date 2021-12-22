@@ -7,6 +7,16 @@ Traefik middleware to start containers on demand.
 ![Go Version](https://img.shields.io/github/go-mod/go-version/acouvreur/traefik-ondemand-plugin?style=flat-square)
 ![Latest Release](https://img.shields.io/github/release/acouvreur/traefik-ondemand-plugin/all.svg?style=flat-square)
 
+- [Traefik Ondemand Plugin](#traefik-ondemand-plugin)
+  - [Features](#features)
+  - [Usage](#usage)
+    - [Plugin configuration](#plugin-configuration)
+      - [Strategies](#strategies)
+      - [Custom loading/error pages](#custom-loadingerror-pages)
+    - [Traefik-Ondemand-Service](#traefik-ondemand-service)
+  - [Examples](#examples)
+  - [Development](#development)
+  - [Authors](#authors)
 
 ## Features
 
@@ -26,7 +36,7 @@ Traefik middleware to start containers on demand.
 
 #### Strategies
 
-**Dynamic Strategy**
+**Dynamic Strategy (default)**
 
 _Serve an HTML page that self reload._
 
@@ -77,20 +87,20 @@ testData:
   name: TRAEFIK_HACKATHON_whoami
   timeout: 1m
   waitui: false
-  blockingDelay: 1m
-  loadingpage: /opt/on-demand/loading.html
-  errorpage: /opt/on-demand/error.html
+  blockdelay: 1m
+  loadingpage: /etc/traefik/plugins/traefik-ondemand-plugin/custompages/loading.html
+  errorpage: /etc/traefik/plugins/traefik-ondemand-plugin/custompages/error.html
 ```
 
-| Parameter       | Type            | Example                       | Description                                                                           |
-| --------------- | --------------- | ----------------------------- | ------------------------------------------------------------------------------------- |
-| `serviceUrl`    | `string`        | `http://ondemand:10000`       | The docker container name, or the swarm service name                                  |
-| `name`          | `string`        | `TRAEFIK_HACKATHON_whoami`    | The container/service to be stopped (docker ps docker service ls)                     |
-| `timeout`       | `time.Duration` | `1m30s`                       | The duration after which the container/service will be scaled down to 0               |
-| `waitui`        | `bool`          | `true`                        | Serves a self-refreshing html page when the service is scaled down to 0               |
-| `blockingDelay` | `time.Duration` | `1m30s`                       | When `waitui` is `false`, wait for the service to be scaled up before `blockingDelay` |
-| `loadingpage`   | `string`        | `/opt/on-demand/loading.html` | The path in the traefik container for the loading page template                       |
-| `errorpage`     | `string`        | `/opt/on-demand/error.html`   | The path in the traefik container for the error page template                         |
+| Parameter     | Type            | Default | Required | Example                                                                 | Description                                                                        |
+| ------------- | --------------- | ------- | -------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `serviceUrl`  | `string`        | empty   | yes      | `http://ondemand:10000`                                                 | The docker container name, or the swarm service name                               |
+| `name`        | `string`        | empty   | yes      | `TRAEFIK_HACKATHON_whoami`                                              | The container/service to be stopped (docker ps docker service ls)                  |
+| `timeout`     | `time.Duration` | `1m`    | no       | `1m30s`                                                                 | The duration after which the container/service will be scaled down to 0            |
+| `waitui`      | `bool`          | `true`  | no       | `true`                                                                  | Serves a self-refreshing html page when the service is scaled down to 0            |
+| `blockdelay`  | `time.Duration` | `1m`    | no       | `1m30s`                                                                 | When `waitui` is `false`, wait for the service to be scaled up before `blockdelay` |
+| `loadingpage` | `string`        | empty   | no       | `/etc/traefik/plugins/traefik-ondemand-plugin/custompages/loading.html` | The path in the traefik container for the **loading** page template                |
+| `errorpage`   | `string`        | empty   | no       | `/etc/traefik/plugins/traefik-ondemand-plugin/custompages/error.html`   | The path in the traefik container for the **error** page template                  |
 
 ### Traefik-Ondemand-Service
 
