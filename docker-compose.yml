@@ -59,7 +59,7 @@ services:
         - traefik.http.middlewares.ondemand_nginx.plugin.traefik-ondemand-plugin.name=TRAEFIK_HACKATHON_nginx
         - traefik.http.middlewares.ondemand_nginx.plugin.traefik-ondemand-plugin.serviceurl=http://ondemand:10000
         - traefik.http.middlewares.ondemand_nginx.plugin.traefik-ondemand-plugin.timeout=5m
-        - traefik.http.middlewares.ondemand_nginx.plugin.traefik-ondemand-plugin.waitUi=false
+        - traefik.http.middlewares.ondemand_nginx.plugin.traefik-ondemand-plugin.waitui=false
         - traefik.http.routers.nginx.middlewares=ondemand_nginx@docker
         - traefik.http.routers.nginx.rule=PathPrefix(`/nginx`)
         - traefik.http.services.nginx.loadbalancer.server.port=80

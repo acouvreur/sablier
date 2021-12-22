@@ -16,8 +16,8 @@ type Config struct {
 	Timeout     string `yaml:"timeout"`
 	ErrorPage   string `yaml:"errorpage"`
 	LoadingPage string `yaml:"loadingpage"`
-	WaitUi      bool   `yaml:"waitUi"`
-	BlockDelay  string `yaml:"blockDelay"`
+	WaitUi      bool   `yaml:"waitui"`
+	BlockDelay  string `yaml:"blockdelay"`
 }
 
 // CreateConfig creates a config with its default values
