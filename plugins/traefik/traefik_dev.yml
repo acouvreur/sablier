@@ -1,0 +1,22 @@
+pilot:
+  token: "$TRAEFIK_PILOT_TOKEN"
+
+api:
+  dashboard: true
+  insecure: true
+
+experimental:
+  localPlugins:
+    traefik-ondemand-plugin:  
+      moduleName: github.com/acouvreur/traefik-ondemand-plugin
+
+entryPoints:
+  http:
+    address: ":80"
+    forwardedHeaders:
+      insecure: true
+
+providers:
+  docker:
+    swarmMode: true
+    exposedByDefault: false
