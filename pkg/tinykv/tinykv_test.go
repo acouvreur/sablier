@@ -115,7 +115,7 @@ func TestMarshalJSON(t *testing.T) {
 	jsonb, err := json.Marshal(rg)
 	assert.Nil(err)
 	json := string(jsonb)
-	assert.Regexp("{\"1\":{\"value\":1},\"2\":{\"value\":2},\"3\":{\"value\":3,\"expiresAt\":\"\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d.\\d\\d\\d\\d\\d\\d\\d\\d\\dZ\",\"expiresAfter\":3000000000000,\"isSliding\":false}}", json)
+	assert.Regexp("{\"1\":{\"value\":1},\"2\":{\"value\":2},\"3\":{\"value\":3,\"expiresAt\":\"\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d.\\d\\d\\d\\d\\d\\d\\d\\d\\dZ\",\"expiresAfter\":3000000000000}}", json)
 }
 
 func TestUnmarshalJSON(t *testing.T) {
@@ -166,36 +166,6 @@ OUT01:
 		}
 		assert.Fail("should have value", i, got[i])
 	}
-}
-
-func Test02(t *testing.T) {
-	assert := assert.New(t)
-	rg := New[int](time.Millisecond * 30)
-
-	rg.Put("1", 1)
-	v, ok := rg.Get("1")
-	assert.True(ok)
-	assert.Equal(1, v)
-
-	rg.Put("1", 1, ExpiresAfter(time.Millisecond*50), IsSliding(true))
-	<-time.After(time.Millisecond * 40)
-	v, ok = rg.Get("1")
-	assert.True(ok)
-	assert.Equal(1, v)
-	<-time.After(time.Millisecond * 10)
-	v, ok = rg.Get("1")
-	assert.True(ok)
-	assert.Equal(1, v)
-	<-time.After(time.Millisecond * 10)
-	v, ok = rg.Get("1")
-	assert.True(ok)
-	assert.Equal(1, v)
-
-	<-time.After(time.Millisecond * 100)
-
-	v, ok = rg.Get("1")
-	assert.False(ok)
-	assert.NotEqual(1, v)
 }
 
 func Test03(t *testing.T) {
@@ -261,30 +231,6 @@ func Test05(t *testing.T) {
 	}
 }
 
-func Test06(t *testing.T) {
-	assert := assert.New(t)
-	kv := New(
-		time.Millisecond,
-		func(k string, v interface{}) {
-			t.Fail()
-		})
-
-	err := kv.Put("1", 1, ExpiresAfter(10*time.Millisecond), IsSliding(true))
-	assert.NoError(err)
-
-	for i := 0; i < 100; i++ {
-		_, ok := kv.Get("1")
-		assert.True(ok)
-		<-time.After(time.Millisecond)
-	}
-	kv.Delete("1")
-
-	<-time.After(time.Millisecond * 30)
-
-	_, ok := kv.Get("1")
-	assert.False(ok)
-}
-
 func Test07(t *testing.T) {
 	assert := assert.New(t)
 
@@ -343,41 +289,6 @@ func Test09IgnoreTimeoutParamsOnCAS(t *testing.T) {
 	<-time.After(time.Millisecond * 12)
 	_, ok = kv.Get(key)
 	assert.False(ok)
-}
-
-func Test10(t *testing.T) {
-	assert := assert.New(t)
-
-	key := "QQG"
-
-	kv := New[interface{}](time.Millisecond)
-	err := kv.Put(
-		key, "G",
-		CAS(func(interface{}, bool) bool { return true }),
-		IsSliding(true),
-		ExpiresAfter(time.Millisecond*15))
-	assert.NoError(err)
-
-	<-time.After(time.Millisecond * 12)
-
-	v, ok := kv.Get(key)
-	assert.True(ok)
-	assert.Equal("G", v)
-
-	<-time.After(time.Millisecond * 12)
-
-	err = kv.Put(key, "OK",
-		CAS(func(currentValue interface{}, found bool) bool {
-			assert.True(found)
-			assert.Equal("G", currentValue)
-			return true
-		}))
-	assert.NoError(err)
-
-	<-time.After(time.Millisecond * 12)
-
-	_, ok = kv.Get(key)
-	assert.True(ok)
 }
 
 func Test11(t *testing.T) {

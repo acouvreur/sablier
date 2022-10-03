@@ -10,33 +10,17 @@ import (
 type timeout struct {
 	expiresAt    time.Time
 	expiresAfter time.Duration
-	isSliding    bool
 	key          string
 }
 
 func newTimeout(
 	key string,
-	expiresAfter time.Duration,
-	isSliding bool) *timeout {
+	expiresAfter time.Duration) *timeout {
 	return &timeout{
 		expiresAt:    time.Now().Add(expiresAfter),
 		expiresAfter: expiresAfter,
-		isSliding:    isSliding,
 		key:          key,
 	}
-}
-
-func (to *timeout) slide() {
-	if to == nil {
-		return
-	}
-	if !to.isSliding {
-		return
-	}
-	if to.expiresAfter <= 0 {
-		return
-	}
-	to.expiresAt = time.Now().Add(to.expiresAfter)
 }
 
 func (to *timeout) expired() bool {
@@ -90,7 +74,6 @@ type KV[T any] interface {
 
 type putOpt struct {
 	expiresAfter time.Duration
-	isSliding    bool
 	cas          func(interface{}, bool) bool
 }
 
@@ -101,13 +84,6 @@ type PutOption func(*putOpt)
 func ExpiresAfter(expiresAfter time.Duration) PutOption {
 	return func(opt *putOpt) {
 		opt.expiresAfter = expiresAfter
-	}
-}
-
-// IsSliding sets if the entry would get expired in a sliding manner
-func IsSliding(isSliding bool) PutOption {
-	return func(opt *putOpt) {
-		opt.isSliding = isSliding
 	}
 }
 
@@ -173,7 +149,6 @@ func (kv *store[T]) Get(k string) (T, bool) {
 	if !ok {
 		return zero, ok
 	}
-	e.slide()
 	if e.expired() {
 		go notifyExpirations(map[string]T{k: e.value}, kv.onExpire)
 		delete(kv.kv, k)
@@ -217,7 +192,6 @@ func (kv *store[T]) Entries() (entries map[string]entry[T]) {
 			t := &timeout{
 				expiresAt:    v.expiresAt,
 				expiresAfter: v.expiresAfter,
-				isSliding:    v.isSliding,
 				key:          k,
 			}
 			e.timeout = t
@@ -239,7 +213,7 @@ func (kv *store[T]) Put(k string, v T, options ...PutOption) error {
 	kv.mx.Lock()
 	defer kv.mx.Unlock()
 	if opt.expiresAfter > 0 {
-		e.timeout = newTimeout(k, opt.expiresAfter, opt.isSliding)
+		e.timeout = newTimeout(k, opt.expiresAfter)
 		timeheapPush(&kv.heap, e.timeout)
 	}
 	if opt.cas != nil {
@@ -261,12 +235,10 @@ func (e *entry[T]) MarshalJSON() ([]byte, error) {
 			Value        T             `json:"value"`
 			ExpiresAt    time.Time     `json:"expiresAt"`
 			ExpiresAfter time.Duration `json:"expiresAfter"`
-			IsSliding    bool          `json:"isSliding"`
 		}{
 			Value:        e.value,
 			ExpiresAt:    e.expiresAt,
 			ExpiresAfter: e.expiresAfter,
-			IsSliding:    e.isSliding,
 		})
 	} else {
 		return json.Marshal(&struct {
@@ -290,7 +262,6 @@ func (kv *store[T]) UnmarshalJSON(b []byte) error {
 	json.Unmarshal([]byte(b), &result)
 
 	for k, v := range result {
-		// TODO: Handle sliding...
 		kv.Put(k, v.Value, ExpiresAfter(v.ExpiresAfter))
 	}
 
@@ -311,8 +282,6 @@ func (e *minimalEntry[T]) UnmarshalJSON(b []byte) error {
 		e.Value = result.Value
 		e.ExpiresAfter = time.Until(result.ExpiresAt)
 	}
-	// TODO: Handle sliding...
-
 	return nil
 }
 
@@ -332,7 +301,6 @@ func (kv *store[T]) cas(k string, e *entry[T], casFunc func(interface{}, bool) b
 		old.value = e.value
 		e = old
 	}
-	e.slide()
 	kv.kv[k] = e
 	return nil
 }
