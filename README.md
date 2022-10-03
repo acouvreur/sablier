@@ -5,6 +5,10 @@
 Sablier is an API that start containers on demand.
 It provides an integrations with multiple reverse proxies and different loading strategies.
 
+Sablier is a merge from https://github.com/acouvreur/traefik-ondemand-plugin/ and https://github.com/acouvreur/traefik-ondemand-service/. This repository was renamed to Sablier.
+
+Because Traefik doesn't support go module v2+ yet, this is re-released starting at v1.0.0 instead of my original plans as 2.0.0.
+
 ![Hourglass](./docs/img/hourglass.png)
 
 - [Sablier](#sablier)
