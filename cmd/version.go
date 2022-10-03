@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/acouvreur/sablier/version"
+	"github.com/acouvreur/sablier/v2/version"
 	"github.com/spf13/cobra"
 )
 

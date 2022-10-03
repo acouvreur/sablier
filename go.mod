@@ -1,4 +1,4 @@
-module github.com/acouvreur/sablier
+module github.com/acouvreur/sablier/v2
 
 go 1.18
 

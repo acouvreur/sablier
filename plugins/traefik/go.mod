@@ -1,4 +1,4 @@
-module github.com/acouvreur/sablier/plugins/traefik
+module github.com/acouvreur/sablier/v2/plugins/traefik
 
 go 1.18
 
