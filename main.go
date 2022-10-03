@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/acouvreur/sablier/v2/cmd"
+	"github.com/acouvreur/sablier/cmd"
 )
 
 func main() {
