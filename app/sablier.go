@@ -120,7 +120,7 @@ func initPersistentStorage(config config.Storage, store tinykv.KV[OnDemandReques
 }
 
 func initServer(conf config.Server, scaler scaler.Scaler, store tinykv.KV[OnDemandRequestState]) error {
-	r := gin.Default()
+	r := gin.New()
 
 	r.Use(middleware.Logger(log.New()), gin.Recovery())
 
