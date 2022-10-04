@@ -16,10 +16,7 @@ RUN make ${TARGETOS}/${TARGETARCH}
 
 FROM alpine
 
-RUN addgroup -S sablier && adduser -S sablier -G sablier
-USER sablier:sablier
-
-COPY --from=build --chown=sablier:sablier /go/src/sablier/sablier* /go/bin/sablier
+COPY --from=build /go/src/sablier/sablier* /go/bin/sablier
 
 EXPOSE 10000
 
