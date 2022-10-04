@@ -1,18 +1,27 @@
-FROM golang:1.18-alpine AS build
+FROM golang:1.18 AS build
 
-ENV CGO_ENABLED=0
 ENV PORT 10000
 
-COPY . /go/src/sablier
 WORKDIR /go/src/sablier
+
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+
+COPY . /go/src/sablier
 
 ARG TARGETOS
 ARG TARGETARCH
-RUN GIN_MODE=release GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -buildvcs=false -o /go/bin/sablier
+RUN make ${TARGETOS}/${TARGETARCH}
 
 FROM alpine
+
+RUN addgroup -S sablier && adduser -S sablier -G sablier
+USER sablier:sablier
+
+COPY --from=build --chown=sablier:sablier /go/src/sablier/sablier* /go/bin/sablier
+
 EXPOSE 10000
-COPY --from=build /go/bin/sablier /go/bin/sablier
 
 ENTRYPOINT [ "/go/bin/sablier" ]
-CMD [ "--swarmMode=true" ]
+CMD [ "start", "--provider.name=docker"]

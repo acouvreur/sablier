@@ -13,8 +13,10 @@ VPREFIX := github.com/acouvreur/sablier/version
 GO_LDFLAGS := -X $(VPREFIX).Branch=$(GIT_BRANCH) -X $(VPREFIX).Version=$(version) -X $(VPREFIX).Revision=$(GIT_REVISION) -X $(VPREFIX).BuildUser=$(shell whoami)@$(shell hostname) -X $(VPREFIX).BuildDate=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 $(PLATFORMS):
-	GIN_MODE=release GOOS=$(os) GOARCH=$(arch) go build -ldflags="${GO_LDFLAGS}" -o 'sablier_$(version)_$(os)-$(arch)' .
+	CGO_ENABLED=0 GIN_MODE=release GOOS=$(os) GOARCH=$(arch) go build -tags=nomsgpack -v -ldflags="${GO_LDFLAGS}" -o 'sablier_$(version)_$(os)-$(arch)' .
 
+build:
+	CGO_ENABLED=0 GIN_MODE=release GOOS=$(os) GOARCH=$(arch) go build -tags=nomsgpack -v -ldflags="${GO_LDFLAGS}" -o 'sablier_$(version)_$(os)-$(arch)' .
 
 release: $(PLATFORMS)
 .PHONY: release $(PLATFORMS)
