@@ -1,16 +1,20 @@
 package strategy
 
 import (
+	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 )
 
 // Net client is a custom client to timeout after 2 seconds if the service is not ready
 var netClient = &http.Client{
 	Timeout: time.Second * 2,
+}
+
+type SablierResponse struct {
+	State string `json:"state"`
+	Error string `json:"error"`
 }
 
 type Strategy interface {
@@ -25,15 +29,16 @@ func getServiceStatus(request string) (string, error) {
 		return "error", err
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	decoder := json.NewDecoder(resp.Body)
+	var response SablierResponse
+	err = decoder.Decode(&response)
 	if err != nil {
-		return "parsing error", err
+		return "error from ondemand service", err
 	}
 
 	if resp.StatusCode >= 400 {
-		return "error from ondemand service", errors.New(string(body))
+		return "error from ondemand service", errors.New(response.Error)
 	}
 
-	return strings.TrimSuffix(string(body), "\n"), nil
+	return response.State, nil
 }
