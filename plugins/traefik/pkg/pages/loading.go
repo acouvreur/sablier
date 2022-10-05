@@ -229,13 +229,10 @@ var loadingPage = `<!doctype html>
     <h2 class="headline" id="headline">{{ .Name }} is loading...</h2>
     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
 
-    <p class="message text" id="message">Your instance is loading, and will be
-      ready shortly.</p>
-
+    <p class="message text" id="message">Your instance is loading, and will be ready shortly.</p>
 
     <div class="support text">
-      Your instance will shutdown automatically after {{ .Timeout }} of
-      inactivity.
+      Your instance will shutdown automatically after {{ .Timeout }} of inactivity.
     </div>
   </section>
 
@@ -277,7 +274,7 @@ func GetLoadingPage(template_path string, name string, timeout time.Duration) st
 }
 
 // humanizeDuration humanizes time.Duration output to a meaningful value,
-// golang's default ``time.Duration`` output is badly formatted and unreadable.
+// golang's default “time.Duration“ output is badly formatted and unreadable.
 func humanizeDuration(duration time.Duration) string {
 	if duration.Seconds() < 60.0 {
 		return fmt.Sprintf("%d seconds", int64(duration.Seconds()))
