@@ -22,19 +22,20 @@ destroy_kubernetes() {
   docker compose -f $DOCKER_COMPOSE_FILE -p $DOCKER_COMPOSE_PROJECT_NAME down --volumes
 }
 
-prepare_traefik_and_sablier() {
+prepare_traefik() {
   helm repo add traefik https://helm.traefik.io/traefik
   helm repo update
   helm install traefik traefik/traefik -f values.yaml --namespace kube-system
-  kubectl apply -f ./manifests/sablier.yml
 }
 
 prepare_deployment() {
+  kubectl apply -f ./manifests/sablier.yml
   kubectl apply -f ./manifests/deployment.yml
 }
 
 destroy_deployment() {
   kubectl delete -f ./manifests/deployment.yml
+  kubectl delete -f ./manifests/sablier.yml
 }
 
 prepare_stateful_set() {
@@ -46,7 +47,7 @@ destroy_stateful_set() {
 }
 
 run_kubernetes_deployment_test() {
-  echo "Running Kubernetes Test: $1"
+  echo "---- Running Kubernetes Test: $1 ----"
   prepare_deployment
   sleep 10
   go clean -testcache
@@ -62,9 +63,9 @@ run_kubernetes_deployment_test() {
 trap destroy_kubernetes EXIT
 
 prepare_kubernetes
-prepare_traefik_and_sablier
+prepare_traefik
 run_kubernetes_deployment_test Test_Dynamic
-run_kubernetes_deployment_test Test_Blocking
+# run_kubernetes_deployment_test Test_Blocking # Blocking is not yet supported
 run_kubernetes_deployment_test Test_Multiple
 run_kubernetes_deployment_test Test_Healthy
 
