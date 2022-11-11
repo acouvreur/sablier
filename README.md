@@ -196,69 +196,8 @@ This is best suited when this interaction is made through a browser.
 
 ### Creating your own loading theme
 
-Use `--strategy.dynamic.custom-themes-path` to specify the folder containing your themes.
+See [creating your own theme](docs/THEMES.md).
 
-Your theme will be rendered using a Go Template structure such as :
-
-```go
-type TemplateValues struct {
-	DisplayName      string
-	InstanceStates   []RenderOptionsInstanceState
-	SessionDuration  string
-	RefreshFrequency string
-	Version          string
-}
-```
-
-```go
-type RenderOptionsInstanceState struct {
-	Name            string
-	CurrentReplicas int
-	DesiredReplicas int
-	Status          string
-	Error           error
-}
-```
-
-- ⚠️ IMPORTANT ⚠️ You should always use `RefreshFrequency` like this:
-    ```html
-    <head>
-      ...
-      <meta http-equiv="refresh" content="{{ .RefreshFrequency }}" />
-      ...
-    </head>
-    ```
-    This will refresh the loaded page automatically every `RefreshFrequency`.
-- You **cannot** load new themes added in the folder without restarting
-- You **can** modify the existing themes files
-- Why? Because we build a theme whitelist in order to prevent malicious payload crafting by using `theme=../../very_secret.txt`
-- Custom themes **must end** with `.html`
-- You can load themes by specifying their name and their relative path from the `--strategy.dynamic.custom-themes-path` value.
-    ```bash
-    /my/custom/themes/
-    ├── custom1.html      # custom1
-    ├── custom2.html      # custom2
-    └── special
-        └── secret.html   # special/secret
-    ```
-
-You can see the available themes from the API:
-```
-> curl 'http://localhost:10000/api/strategies/dynamic/themes'
-```
-```json
-{
-  "custom": [
-    "custom"
-  ],
-  "embedded": [
-    "ghost",
-    "hacker-terminal",
-    "matrix",
-    "shuffle"
-  ]
-}
-```
 ## Blocking the loading until the session is ready
 
 **The Blocking Strategy waits for the instances to load before serving the request**
@@ -270,8 +209,6 @@ strategy:
     # Default timeout used for blocking strategy (default 1m)
     default-timeout: 1m
 ```
-
-
 
 ## 💾 Saving the state to a file
 
