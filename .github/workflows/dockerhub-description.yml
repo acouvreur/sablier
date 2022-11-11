@@ -1,0 +1,15 @@
+name: Update Docker Hub Description
+on: release
+
+jobs:
+  dockerHubDescription:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Docker Hub Description
+      uses: peter-evans/dockerhub-description@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        short-description: ${{ github.event.repository.description }}
