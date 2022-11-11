@@ -42,7 +42,7 @@ docker run -d --name whoami containous/whoami:v1.5.0
 docker stop whoami
 
 # Start Sablier with the docker provider
-docker run -v /var/run/docker.sock:/var/run/docker.sock -p 10000:10000 ghcr.io/acouvreur/sablier:latest --provider.name=docker
+docker run -d -v /var/run/docker.sock:/var/run/docker.sock -p 10000:10000 ghcr.io/acouvreur/sablier:latest start --provider.name=docker
 
 # Start the containers, the request will hang until both containers are up and running
 curl 'http://localhost:10000/api/strategies/blocking?names=nginx&names=whoami&session_duration=1m'
@@ -53,6 +53,7 @@ curl 'http://localhost:10000/api/strategies/blocking?names=nginx&names=whoami&se
         "instance": {
           "name": "nginx",
           "currentReplicas": 1,
+          "desiredReplicas": 1,
           "status": "ready"
       },
         "error": null
@@ -61,6 +62,7 @@ curl 'http://localhost:10000/api/strategies/blocking?names=nginx&names=whoami&se
         "instance": {
           "name": "nginx",
           "currentReplicas": 1,
+          "desiredReplicas": 1,
           "status": "ready"
        },
         "error": null
@@ -233,12 +235,18 @@ This is best suited when this interaction is made through a browser.
 
 ### Dynamic Strategy Configuration
 
-| Cli                                            | Yaml file                                    | Environment variable                         | Default           | Description                                                     |
-| ---------------------------------------------- | -------------------------------------------- | -------------------------------------------- | ----------------- | --------------------------------------------------------------- |
-| strategy                                       |
-| `--strategy.dynamic.custom-themes-path`        | `strategy.dynamic.custom-themes-path`        | `STRATEGY_DYNAMIC_CUSTOM_THEMES_PATH`        |                   | Custom themes folder, will load all .html files recursively     |
-| `--strategy.dynamic.default-refresh-frequency` | `strategy.dynamic.default-refresh-frequency` | `STRATEGY_DYNAMIC_DEFAULT_REFRESH_FREQUENCY` | `5s`              | Default refresh frequency in the HTML page for dynamic strategy |
-| `--strategy.dynamic.default-theme`             | `strategy.dynamic.default-theme`             | `STRATEGY_DYNAMIC_DEFAULT_THEME`             | `hacker-terminal` | Default theme used for dynamic strategy                         |
+```yaml
+strategy:
+  dynamic:
+    # Custom themes folder, will load all .html files recursively (default empty)
+    custom-themes-path:
+    # Show instances details by default in waiting UI
+    show-details-by-default: false
+    # Default theme used for dynamic strategy (default "hacker-terminal")
+    default-theme: hacker-terminal
+    # Default refresh frequency in the HTML page for dynamic strategy
+    default-refresh-frequency: 5s
+```
 
 ### Creating your own loading theme
 
