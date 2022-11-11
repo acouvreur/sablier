@@ -22,6 +22,7 @@ Which allows you to start your containers on demand and shut them down automatic
   - [Blocking the loading until the session is ready](#blocking-the-loading-until-the-session-is-ready)
   - [💾 Saving the state to a file](#-saving-the-state-to-a-file)
   - [Reverse proxies integration plugins](#reverse-proxies-integration-plugins)
+    - [Traefik Middleware Plugin](#traefik-middleware-plugin)
   - [Glossary](#glossary)
   - [Credits](#credits)
 
@@ -289,7 +290,9 @@ Loaded instances that expired during the restart won't be changed though, they w
 
 ## Reverse proxies integration plugins
 
-- [Traefik](./plugins/traefik/README.md)
+### Traefik Middleware Plugin
+
+See [Traefik Middleware Plugin](./plugins/traefik/README.md)
 
 ## Glossary
 
