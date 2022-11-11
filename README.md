@@ -120,13 +120,13 @@ strategy:
     custom-themes-path:
     # Show instances details by default in waiting UI
     show-details-by-default: false
-    # Default theme used for dynamic strategy
-    default-theme: configfile
+    # Default theme used for dynamic strategy (default "hacker-terminal")
+    default-theme: hacker-terminal
     # Default refresh frequency in the HTML page for dynamic strategy
     default-refresh-frequency: 5s
   blocking:
-    # Default timeout used for blocking strategy
-    default-timeout: 1h
+    # Default timeout used for blocking strategy (default 1m)
+    default-timeout: 1m
 ```
 
 ### Environment Variables
@@ -262,6 +262,15 @@ You can see the available themes from the API:
 
 **The Blocking Strategy waits for the instances to load before serving the request**
 This is best suited when this interaction from an API.
+
+```yaml
+strategy:
+  blocking:
+    # Default timeout used for blocking strategy (default 1m)
+    default-timeout: 1m
+```
+
+
 
 ## 💾 Saving the state to a file
 
