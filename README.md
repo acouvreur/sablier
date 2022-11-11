@@ -16,6 +16,10 @@ Which allows you to start your containers on demand and shut them down automatic
     - [Configuration File](#configuration-file)
     - [Environment Variables](#environment-variables)
     - [Arguments](#arguments)
+  - [Install Sablier](#install-sablier)
+    - [Use the Docker image](#use-the-docker-image)
+    - [Use the binary distribution](#use-the-binary-distribution)
+    - [Compile your binary from the sources](#compile-your-binary-from-the-sources)
   - [Loading with a waiting page](#loading-with-a-waiting-page)
     - [Dynamic Strategy Configuration](#dynamic-strategy-configuration)
     - [Creating your own loading theme](#creating-your-own-loading-theme)
@@ -171,6 +175,46 @@ Becomes
 
 ```bash
 sablier start --strategy.dynamic.custom-themes-path /my/path
+```
+
+## Install Sablier
+
+You can install Traefik with the following flavors:
+
+- Use the Docker image
+- Use the binary distribution
+- Compile your binary from the sources
+
+### Use the Docker image
+
+- **Docker Hub**: [acouvreur/sablier](https://hub.docker.com/r/acouvreur/sablier)
+- **Guthub Container Registry**: [ghcr.io/acouvreur/sablier](https://github.com/acouvreur/sablier/pkgs/container/sablier)
+  
+Choose one of the Docker images and run it with one sample configuration file:
+
+```bash
+docker run -d -p 10000:10000 \
+    -v $PWD/sablier.yml:/etc/sablier/sablier.yml acouvreur/sablier:1.1.0
+```
+
+### Use the binary distribution
+
+Grab the latest binary from the [releases](https://github.com/acouvreur/sablier/releases) page.
+
+And run it:
+
+```bash
+./sablier --help
+```
+
+### Compile your binary from the sources
+
+```bash
+git clone git@github.com:acouvreur/sablier.git
+cd sablier
+make
+# Output will change depending on your distro
+./sablier_draft_linux-amd64
 ```
 
 ## Loading with a waiting page
