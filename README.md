@@ -154,8 +154,8 @@ sablier --help
 
 # or
 
-docker run sablier[:version] --help
-# ex: docker run sablier:v1.0.0 --help
+docker run acouvreur/sablier[:version] --help
+# ex: docker run acouvreur/sablier:v1.0.0 --help
 ```
 
 All arguments can be used in the form of the config file such as 
