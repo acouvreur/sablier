@@ -8,7 +8,7 @@ It provides an integrations with multiple reverse proxies and different loading 
 
 Which allows you to start your containers on demand and shut them down automatically as soon as there's no activity.
 
-![Hourglass](./docs/img/hourglass.png)
+![Hourglass](https://raw.githubusercontent.com/acouvreur/sablier/main/docs/img/hourglass.png)
 
 - [⏳ Sablier](#-sablier)
   - [⚡️ Quick start](#️-quick-start)
@@ -224,12 +224,12 @@ make
 **The Dynamic Strategy provides a waiting UI with multiple themes.**
 This is best suited when this interaction is made through a browser.
 
-|       Name        |                       Preview                       |
-| :---------------: | :-------------------------------------------------: |
-|      `ghost`      |           ![ghost](./docs/img/ghost.png)           |
-|     `shuffle`     |         ![shuffle](./docs/img/shuffle.png)         |
-| `hacker-terminal` | ![hacker-terminal](./docs/img/hacker-terminal.png) |
-|     `matrix`      |          ![matrix](./docs/img/matrix.png)          |
+|       Name        |                                                  Preview                                                  |
+| :---------------: | :-------------------------------------------------------------------------------------------------------: |
+|      `ghost`      |           ![ghost](https://raw.githubusercontent.com/acouvreur/sablier/main/docs/img/ghost.png)           |
+|     `shuffle`     |         ![shuffle](https://raw.githubusercontent.com/acouvreur/sablier/main/docs/img/shuffle.png)         |
+| `hacker-terminal` | ![hacker-terminal](https://raw.githubusercontent.com/acouvreur/sablier/main/docs/img/hacker-terminal.png) |
+|     `matrix`      |          ![matrix](https://raw.githubusercontent.com/acouvreur/sablier/main/docs/img/matrix.png)          |
 
 ### Dynamic Strategy Configuration
 
@@ -275,7 +275,7 @@ Loaded instances that expired during the restart won't be changed though, they w
 
 ### Traefik Middleware Plugin
 
-See [Traefik Middleware Plugin](./plugins/traefik/README.md)
+See [Traefik Middleware Plugin](https://github.com/acouvreur/sablier/tree/main/plugins/traefik/README.md)
 
 ## Glossary
 
