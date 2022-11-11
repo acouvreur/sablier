@@ -1,4 +1,4 @@
-# ⏳ Sablier
+# Sablier
 
 ![Github Actions](https://img.shields.io/github/workflow/status/acouvreur/sablier/Build?style=flat-square) ![Go Report](https://goreportcard.com/badge/github.com/acouvreur/sablier?style=flat-square) ![Go Version](https://img.shields.io/github/go-mod/go-version/acouvreur/sablier?style=flat-square) ![Latest Release](https://img.shields.io/github/release/acouvreur/sablier/all.svg?style=flat-square)
 
@@ -10,9 +10,9 @@ Which allows you to start your containers on demand and shut them down automatic
 
 ![Hourglass](https://raw.githubusercontent.com/acouvreur/sablier/main/docs/img/hourglass.png)
 
-- [⏳ Sablier](#-sablier)
-  - [⚡️ Quick start](#️-quick-start)
-  - [⚙️ Configuration](#️-configuration)
+- [Sablier](#sablier)
+  - [Quick start](#quick-start)
+  - [Configuration](#configuration)
     - [Configuration File](#configuration-file)
     - [Environment Variables](#environment-variables)
     - [Arguments](#arguments)
@@ -24,13 +24,13 @@ Which allows you to start your containers on demand and shut them down automatic
     - [Dynamic Strategy Configuration](#dynamic-strategy-configuration)
     - [Creating your own loading theme](#creating-your-own-loading-theme)
   - [Blocking the loading until the session is ready](#blocking-the-loading-until-the-session-is-ready)
-  - [💾 Saving the state to a file](#-saving-the-state-to-a-file)
+  - [Saving the state to a file](#saving-the-state-to-a-file)
   - [Reverse proxies integration plugins](#reverse-proxies-integration-plugins)
     - [Traefik Middleware Plugin](#traefik-middleware-plugin)
   - [Glossary](#glossary)
   - [Credits](#credits)
 
-## ⚡️ Quick start
+## Quick start
 
 ```bash
 # Create and stop nginx container
@@ -71,7 +71,7 @@ curl 'http://localhost:10000/api/strategies/blocking?names=nginx&names=whoami&se
 }
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 There are three different ways to define configuration options in Sablier:
 
@@ -256,7 +256,7 @@ strategy:
     default-timeout: 1m
 ```
 
-## 💾 Saving the state to a file
+## Saving the state to a file
 
 You can save the state of the application in case of failure to resume your sessions.
 
