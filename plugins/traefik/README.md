@@ -2,9 +2,9 @@
 
 - [Traefik Sablier Plugin](#traefik-sablier-plugin)
   - [Installation](#installation)
-  - [🐳 Traefik with Docker classic](#-traefik-with-docker-classic)
-  - [🐙 Traefik with Docker Swarm](#-traefik-with-docker-swarm)
-  - [☸️ Traefik with Kubernetes](#️-traefik-with-kubernetes)
+  - [Traefik with Docker classic](#traefik-with-docker-classic)
+  - [Traefik with Docker Swarm](#traefik-with-docker-swarm)
+  - [Traefik with Kubernetes](#traefik-with-kubernetes)
   - [Plugin](#plugin)
   - [Development](#development)
 
@@ -48,7 +48,7 @@ http:
 
 You can also checkout the End to End tests here: [e2e](./e2e/).
 
-## 🐳 Traefik with Docker classic
+## Traefik with Docker classic
 
 
 **Container labels cannot be used**
@@ -121,7 +121,7 @@ http:
       service: "whoami"
 ```
 
-## 🐙 Traefik with Docker Swarm
+## Traefik with Docker Swarm
 
 ⚠️ Limitations
 
@@ -137,7 +137,7 @@ http:
     ```
 - We cannot use [allowEmptyServices](https://doc.traefik.io/traefik/providers/docker/#allowemptyservices) because if you use the [blocking strategy](LINKHERE) you will receive a `503`.
 
-## ☸️ Traefik with Kubernetes
+## Traefik with Kubernetes
 
 - The format of the `names` section is `<KIND>_<NAMESPACE>_<NAME>_<REPLICACOUNT>` where `_` is the delimiter.
   - Thus no `_` are allowed in `<NAME>`
