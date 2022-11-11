@@ -44,22 +44,22 @@ curl 'http://localhost:10000/api/strategies/blocking?names=nginx&names=whoami&se
 {
   "session": {
     "instances": [
-  {
+      {
         "instance": {
           "name": "nginx",
           "currentReplicas": 1,
           "status": "ready"
-    },
+      },
         "error": null
-  },
-  {
+      },
+      {
         "instance": {
           "name": "nginx",
           "currentReplicas": 1,
           "status": "ready"
-    },
+       },
         "error": null
-  }
+      }
     ],
     "status":"ready"
   }
