@@ -265,7 +265,7 @@ This is best suited when this interaction from an API.
 
 ## 💾 Saving the state to a file
 
-You can save the state of the application in case of failure toi resume your sessions.
+You can save the state of the application in case of failure to resume your sessions.
 
 For this you can use the `storage` configuration.
 
