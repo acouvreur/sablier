@@ -28,6 +28,7 @@ Which allows you to start your containers on demand and shut them down automatic
   - [Blocking the loading until the session is ready](#blocking-the-loading-until-the-session-is-ready)
   - [Saving the state to a file](#saving-the-state-to-a-file)
   - [Glossary](#glossary)
+  - [Versioning](#versioning)
   - [Credits](#credits)
 
 ## Quick start with Traefik
@@ -293,6 +294,22 @@ I'll use these terms in order to be provider agnostic.
 
 - **Session**: A Session is a set of **instances**
 - **Instance**: An instance is either a docker container, docker swarm service, kubernetes deployment or kubernetes statefulset
+
+## Versioning
+
+Sablier follows the [Semantic Versioning 2.0.0](https://semver.org/) Specification (SemVer).
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+  1.  MAJOR version when you make incompatible API changes
+  2.  MINOR version when you add functionality in a backwards compatible manner
+  3.  PATCH version when you make backwards compatible bug fixes
+
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
+This process is fully automated using [Semantic Release](https://github.com/semantic-release/semantic-release).
+
+The configuration is [release.config.js](https://github.com/acouvreur/sablier/blob/main/release.config.js).
 
 ## Credits
 
