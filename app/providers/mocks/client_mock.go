@@ -263,7 +263,7 @@ func ServiceGlobal(name string) swarm.Service {
 	}
 }
 
-func SeviceScaledEvent(name string, oldReplicas string, newReplicas string) events.Message {
+func ServiceScaledEvent(name string, oldReplicas string, newReplicas string) events.Message {
 	return events.Message{
 		Scope:  "swarm",
 		Action: "update",
