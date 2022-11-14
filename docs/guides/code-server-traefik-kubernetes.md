@@ -189,7 +189,6 @@
     time="2022-11-14T01:40:49Z" level=info msg="(version=1.1.1, branch=HEAD, revision=a913bc2a3b0f4aca5b9ac7ddc9af5428ef411dba)"
     time="2022-11-14T01:40:49Z" level=info msg="using provider \"kubernetes\""
     time="2022-11-14T01:40:49Z" level=info msg="initialized storage to /etc/sablier/state.json"
-    time="2022-11-14T01:40:49Z" level=error msg="error loading sessionsEOF"
     time="2022-11-14T01:40:49Z" level=info msg="server listening :10000"
     ```
 
