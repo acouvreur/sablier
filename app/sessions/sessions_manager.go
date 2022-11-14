@@ -47,7 +47,7 @@ func NewSessionsManager(store tinykv.KV[instance.State], provider providers.Prov
 	}()
 
 	events, cancel := context.WithCancel(context.Background())
-	provider.NotifyInsanceStopped(events, instanceStopped)
+	provider.NotifyInstanceStopped(events, instanceStopped)
 
 	return &SessionsManager{
 		events:          events,

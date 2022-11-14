@@ -107,7 +107,7 @@ func (provider *DockerClassicProvider) GetState(name string) (instance.State, er
 	}
 }
 
-func (provider *DockerClassicProvider) NotifyInsanceStopped(ctx context.Context, instance chan<- string) {
+func (provider *DockerClassicProvider) NotifyInstanceStopped(ctx context.Context, instance chan<- string) {
 	msgs, errs := provider.Client.Events(ctx, types.EventsOptions{
 		Filters: filters.NewArgs(
 			filters.Arg("scope", "local"),

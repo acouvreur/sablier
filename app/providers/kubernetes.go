@@ -172,7 +172,7 @@ func (provider *KubernetesProvider) getStatefulsetState(config *Config) (instanc
 	return instance.NotReadyInstanceState(config.OriginalName, int(ss.Status.ReadyReplicas), int(config.Replicas))
 }
 
-func (provider *KubernetesProvider) NotifyInsanceStopped(ctx context.Context, instance chan<- string) {
+func (provider *KubernetesProvider) NotifyInstanceStopped(ctx context.Context, instance chan<- string) {
 
 	inforemer := provider.watchDeployents(instance)
 	go inforemer.Run(ctx.Done())
