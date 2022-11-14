@@ -14,6 +14,8 @@ Which allows you to start your containers on demand and shut them down automatic
   - [Quick start with Traefik](#quick-start-with-traefik)
   - [Reverse proxies integration plugins](#reverse-proxies-integration-plugins)
     - [Traefik Middleware Plugin](#traefik-middleware-plugin)
+  - [Guides](#guides)
+    - [Sablier Guide: Code-Server + Traefik + Kubernetes Ingress](#sablier-guide-code-server--traefik--kubernetes-ingress)
   - [Configuration](#configuration)
     - [Configuration File](#configuration-file)
     - [Environment Variables](#environment-variables)
@@ -79,6 +81,12 @@ See [Traefik Middleware Plugin](https://github.com/acouvreur/sablier/tree/main/p
 - [Traefik Middleware Plugin with Docker classic](https://github.com/acouvreur/sablier/tree/main/plugins/traefik/README.md#traefik-with-docker-classic)
 - [Traefik Middleware Plugin with Docker Swarm](https://github.com/acouvreur/sablier/tree/main/plugins/traefik/README.md#traefik-with-docker-swarm)
 - [Traefik Middleware Plugin with Kubernetes](https://github.com/acouvreur/sablier/tree/main/plugins/traefik/README.md#traefik-with-kubernetes)
+
+## Guides
+
+### Sablier Guide: Code-Server + Traefik + Kubernetes Ingress
+
+See [Sablier Guide: Code-Server + Traefik + Kubernetes Ingress](./docs/guides/code-server-traefik-kubernetes.md)
 
 ## Configuration
 
