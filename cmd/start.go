@@ -7,8 +7,7 @@ import (
 )
 
 var newStartCommand = func() *cobra.Command {
-	cmd := &cobra.Command{
-
+	return &cobra.Command{
 		Use:   "start",
 		Short: "Start the Sablier server",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -20,5 +19,4 @@ var newStartCommand = func() *cobra.Command {
 			}
 		},
 	}
-	return cmd
 }

@@ -77,8 +77,9 @@ It provides an integrations with multiple reverse proxies and different loading 
 	viper.BindPFlag("strategy.blocking.default-timeout", startCmd.Flags().Lookup("strategy.blocking.default-timeout"))
 
 	rootCmd.AddCommand(startCmd)
-	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(newVersionCommand())
 
+	healthCmd := newHealthCommand()
 	healthCmd.Flags().String("url", "http://localhost:10000/health", "Sablier health endpoint")
 	rootCmd.AddCommand(healthCmd)
 
