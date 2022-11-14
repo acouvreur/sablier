@@ -79,6 +79,9 @@ It provides an integrations with multiple reverse proxies and different loading 
 	rootCmd.AddCommand(startCmd)
 	rootCmd.AddCommand(versionCmd)
 
+	healthCmd.Flags().String("url", "http://localhost:10000/health", "Sablier health endpoint")
+	rootCmd.AddCommand(healthCmd)
+
 	return rootCmd
 }
 

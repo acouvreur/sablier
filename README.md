@@ -29,6 +29,9 @@ Which allows you to start your containers on demand and shut them down automatic
     - [Creating your own loading theme](#creating-your-own-loading-theme)
   - [Blocking the loading until the session is ready](#blocking-the-loading-until-the-session-is-ready)
   - [Saving the state to a file](#saving-the-state-to-a-file)
+  - [Sablier Healthcheck](#sablier-healthcheck)
+    - [Using the `/health` route](#using-the-health-route)
+    - [Using the `sablier health` command](#using-the-sablier-health-command)
   - [Glossary](#glossary)
   - [Versioning](#versioning)
   - [Credits](#credits)
@@ -294,7 +297,29 @@ If the file doesn't exist it will be created, and it will be syned upon exit.
 
 Loaded instances that expired during the restart won't be changed though, they will simply be ignored.
 
+## Sablier Healthcheck
 
+### Using the `/health` route
+
+You can use the route `/health` to check for healthiness.
+
+- Returns 200 `OK` when ready
+- Returns 503 `Service Unavailable` when terminating
+
+### Using the `sablier health` command
+
+You can use the command `sablier health` to check for healthiness.
+
+`sablier health` takes on argument `--url` which defaults to `http://localhost:10000/health`.
+
+```yml
+services:
+  sablier:
+    image: acouvreur/sablier:1.2.0
+    healthcheck:
+      test: ["sablier", "health"]
+      interval: 1m30s
+```
 
 ## Glossary
 
