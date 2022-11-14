@@ -26,11 +26,12 @@ func NewFileStorage(config config.Storage) (Storage, error) {
 	}
 
 	if storage.Enabled() {
-		_, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, 0755)
+		file, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, 0755)
 
 		if err != nil {
 			return nil, err
 		}
+		defer file.Close()
 
 		log.Infof("initialized storage to %s", config.File)
 	} else {
