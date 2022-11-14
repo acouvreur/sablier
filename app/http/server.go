@@ -72,6 +72,6 @@ func Start(serverConf config.Server, strategyConf config.Strategy, sessionManage
 
 func logRoutes(routes gin.RoutesInfo) {
 	for _, route := range routes {
-		log.Info(fmt.Sprintf("%s %s %s", route.Method, route.Path, route.Handler))
+		log.Debug(fmt.Sprintf("%s %s %s", route.Method, route.Path, route.Handler))
 	}
 }
