@@ -136,8 +136,9 @@ func (provider *DockerSwarmProvider) NotifyInstanceStopped(ctx context.Context, 
 		for {
 			select {
 			case msg := <-msgs:
-				// Send the container that has died to the channel
 				if msg.Actor.Attributes["replicas.new"] == "0" {
+					instance <- msg.Actor.Attributes["name"]
+				} else if msg.Action == "remove" {
 					instance <- msg.Actor.Attributes["name"]
 				}
 			case err := <-errs:

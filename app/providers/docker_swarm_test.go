@@ -310,6 +310,13 @@ func TestDockerSwarmProvider_NotifyInstanceStopped(t *testing.T) {
 				mocks.ServiceScaledEvent("nginx", "1", "0"),
 			},
 			errors: []error{},
+		}, {
+			name: "service nginx is scaled to 0",
+			want: []string{"nginx"},
+			events: []events.Message{
+				mocks.ServiceRemovedEvent("nginx"),
+			},
+			errors: []error{},
 		},
 	}
 	for _, tt := range tests {

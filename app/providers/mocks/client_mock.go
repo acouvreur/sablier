@@ -279,6 +279,20 @@ func ServiceScaledEvent(name string, oldReplicas string, newReplicas string) eve
 	}
 }
 
+func ServiceRemovedEvent(name string) events.Message {
+	return events.Message{
+		Scope:  "swarm",
+		Action: "remove",
+		Type:   "service",
+		Actor: events.Actor{
+			ID: "randomid",
+			Attributes: map[string]string{
+				"name": name,
+			},
+		},
+	}
+}
+
 type KubernetesAPIClientMock struct {
 	mockv1 AppsV1InterfaceMock
 
