@@ -79,13 +79,14 @@ See the [embedded themes](../app/http/pages/themes/).
 ## How to load my custom theme
 
 You can load themes by specifying their name and their relative path from the `--strategy.dynamic.custom-themes-path` value.
-    ```bash
-    /my/custom/themes/
-    ├── custom1.html      # custom1
-    ├── custom2.html      # custom2
-    └── special
-        └── secret.html   # special/secret
-    ```
+
+```bash
+/my/custom/themes/
+├── custom1.html      # custom1
+├── custom2.html      # custom2
+└── special
+    └── secret.html   # special/secret
+```
 
 Such as 
 
