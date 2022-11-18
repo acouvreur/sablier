@@ -1,3 +1,2 @@
-.devcontainer
 sablier.yaml
 ./plugins/traefik/e2e/kubeconfig.yaml

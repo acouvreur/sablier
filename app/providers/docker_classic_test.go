@@ -404,7 +404,7 @@ func TestDockerClassicProvider_Start(t *testing.T) {
 	}
 }
 
-func TestDockerClassicProvider_NotifyInsanceStopped(t *testing.T) {
+func TestDockerClassicProvider_NotifyInstanceStopped(t *testing.T) {
 	tests := []struct {
 		name   string
 		want   []string
@@ -430,7 +430,7 @@ func TestDockerClassicProvider_NotifyInsanceStopped(t *testing.T) {
 			instanceC := make(chan string, 1)
 
 			ctx, cancel := context.WithCancel(context.Background())
-			provider.NotifyInsanceStopped(ctx, instanceC)
+			provider.NotifyInstanceStopped(ctx, instanceC)
 
 			var got []string
 
@@ -439,7 +439,7 @@ func TestDockerClassicProvider_NotifyInsanceStopped(t *testing.T) {
 			close(instanceC)
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NotifyInsanceStopped() = %v, want %v", got, tt.want)
+				t.Errorf("NotifyInstanceStopped() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -26,10 +26,21 @@ func NewFileStorage(config config.Storage) (Storage, error) {
 	}
 
 	if storage.Enabled() {
-		_, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, 0755)
+		file, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, 0755)
 
 		if err != nil {
 			return nil, err
+		}
+		defer file.Close()
+
+		stats, err := file.Stat()
+		if err != nil {
+			return nil, err
+		}
+
+		// Initialize file to an empty JSON3
+		if stats.Size() == 0 {
+			file.WriteString("{}")
 		}
 
 		log.Infof("initialized storage to %s", config.File)

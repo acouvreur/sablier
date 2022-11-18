@@ -263,7 +263,7 @@ func ServiceGlobal(name string) swarm.Service {
 	}
 }
 
-func SeviceScaledEvent(name string, oldReplicas string, newReplicas string) events.Message {
+func ServiceScaledEvent(name string, oldReplicas string, newReplicas string) events.Message {
 	return events.Message{
 		Scope:  "swarm",
 		Action: "update",
@@ -274,6 +274,20 @@ func SeviceScaledEvent(name string, oldReplicas string, newReplicas string) even
 				"name":         name,
 				"replicas.new": newReplicas,
 				"replicas.old": oldReplicas,
+			},
+		},
+	}
+}
+
+func ServiceRemovedEvent(name string) events.Message {
+	return events.Message{
+		Scope:  "swarm",
+		Action: "remove",
+		Type:   "service",
+		Actor: events.Actor{
+			ID: "randomid",
+			Attributes: map[string]string{
+				"name": name,
 			},
 		},
 	}

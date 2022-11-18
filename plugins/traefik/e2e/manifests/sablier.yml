@@ -57,7 +57,6 @@ rules:
       - deployments/scale
       - statefulsets
       - statefulsets/scale
-      - endpoints
     verbs:
       - patch   # Scale up and down
       - get     # Retrieve info about specific dep

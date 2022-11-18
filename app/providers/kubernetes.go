@@ -172,7 +172,7 @@ func (provider *KubernetesProvider) getStatefulsetState(config *Config) (instanc
 	return instance.NotReadyInstanceState(config.OriginalName, int(ss.Status.ReadyReplicas), int(config.Replicas))
 }
 
-func (provider *KubernetesProvider) NotifyInsanceStopped(ctx context.Context, instance chan<- string) {
+func (provider *KubernetesProvider) NotifyInstanceStopped(ctx context.Context, instance chan<- string) {
 
 	inforemer := provider.watchDeployents(instance)
 	go inforemer.Run(ctx.Done())
@@ -193,6 +193,10 @@ func (provider *KubernetesProvider) watchDeployents(instance chan<- string) cach
 			if *newDeployment.Spec.Replicas == 0 {
 				instance <- fmt.Sprintf("deployment_%s_%s_%d", newDeployment.Namespace, newDeployment.Name, *oldDeployment.Spec.Replicas)
 			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			deletedDeployment := obj.(*appsv1.Deployment)
+			instance <- fmt.Sprintf("deployment_%s_%s_%d", deletedDeployment.Namespace, deletedDeployment.Name, *deletedDeployment.Spec.Replicas)
 		},
 	}
 	factory := informers.NewSharedInformerFactoryWithOptions(provider.Client, 2*time.Second, informers.WithNamespace(core_v1.NamespaceAll))
@@ -215,6 +219,10 @@ func (provider *KubernetesProvider) watchStatefulSets(instance chan<- string) ca
 			if *newStatefulSet.Spec.Replicas == 0 {
 				instance <- fmt.Sprintf("statefulset_%s_%s_%d", newStatefulSet.Namespace, newStatefulSet.Name, *oldStatefulSet.Spec.Replicas)
 			}
+		},
+		DeleteFunc: func(obj interface{}) {
+			deletedStatefulSet := obj.(*appsv1.StatefulSet)
+			instance <- fmt.Sprintf("statefulset__%s_%s_%d", deletedStatefulSet.Namespace, deletedStatefulSet.Name, *deletedStatefulSet.Spec.Replicas)
 		},
 	}
 	factory := informers.NewSharedInformerFactoryWithOptions(provider.Client, 2*time.Second, informers.WithNamespace(core_v1.NamespaceAll))

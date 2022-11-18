@@ -34,6 +34,10 @@ func Start(serverConf config.Server, strategyConf config.Strategy, sessionManage
 			api.GET("/strategies/dynamic/themes", strategy.ServeDynamicThemes)
 			api.GET("/strategies/blocking", strategy.ServeBlocking)
 		}
+		health := routes.Health{}
+		health.SetDefaults()
+		health.WithContext(ctx)
+		base.GET("/health", health.ServeHTTP)
 	}
 
 	srv := &http.Server{
@@ -72,6 +76,6 @@ func Start(serverConf config.Server, strategyConf config.Strategy, sessionManage
 
 func logRoutes(routes gin.RoutesInfo) {
 	for _, route := range routes {
-		log.Info(fmt.Sprintf("%s %s %s", route.Method, route.Path, route.Handler))
+		log.Debug(fmt.Sprintf("%s %s %s", route.Method, route.Path, route.Handler))
 	}
 }

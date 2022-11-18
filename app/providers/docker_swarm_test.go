@@ -296,7 +296,7 @@ func TestDockerSwarmProvider_GetState(t *testing.T) {
 	}
 }
 
-func TestDockerSwarmProvider_NotifyInsanceStopped(t *testing.T) {
+func TestDockerSwarmProvider_NotifyInstanceStopped(t *testing.T) {
 	tests := []struct {
 		name   string
 		want   []string
@@ -307,7 +307,14 @@ func TestDockerSwarmProvider_NotifyInsanceStopped(t *testing.T) {
 			name: "service nginx is scaled to 0",
 			want: []string{"nginx"},
 			events: []events.Message{
-				mocks.SeviceScaledEvent("nginx", "1", "0"),
+				mocks.ServiceScaledEvent("nginx", "1", "0"),
+			},
+			errors: []error{},
+		}, {
+			name: "service nginx is scaled to 0",
+			want: []string{"nginx"},
+			events: []events.Message{
+				mocks.ServiceRemovedEvent("nginx"),
 			},
 			errors: []error{},
 		},
@@ -322,7 +329,7 @@ func TestDockerSwarmProvider_NotifyInsanceStopped(t *testing.T) {
 			instanceC := make(chan string)
 
 			ctx, cancel := context.WithCancel(context.Background())
-			provider.NotifyInsanceStopped(ctx, instanceC)
+			provider.NotifyInstanceStopped(ctx, instanceC)
 
 			var got []string
 
@@ -331,7 +338,7 @@ func TestDockerSwarmProvider_NotifyInsanceStopped(t *testing.T) {
 			close(instanceC)
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NotifyInsanceStopped() = %v, want %v", got, tt.want)
+				t.Errorf("NotifyInstanceStopped() = %v, want %v", got, tt.want)
 			}
 		})
 	}

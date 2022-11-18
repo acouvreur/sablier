@@ -124,7 +124,7 @@ func (provider *DockerSwarmProvider) getInstanceName(name string, service swarm.
 	return fmt.Sprintf("%s (%s)", name, service.Spec.Name)
 }
 
-func (provider *DockerSwarmProvider) NotifyInsanceStopped(ctx context.Context, instance chan<- string) {
+func (provider *DockerSwarmProvider) NotifyInstanceStopped(ctx context.Context, instance chan<- string) {
 	msgs, errs := provider.Client.Events(ctx, types.EventsOptions{
 		Filters: filters.NewArgs(
 			filters.Arg("scope", "swarm"),
@@ -136,8 +136,9 @@ func (provider *DockerSwarmProvider) NotifyInsanceStopped(ctx context.Context, i
 		for {
 			select {
 			case msg := <-msgs:
-				// Send the container that has died to the channel
 				if msg.Actor.Attributes["replicas.new"] == "0" {
+					instance <- msg.Actor.Attributes["name"]
+				} else if msg.Action == "remove" {
 					instance <- msg.Actor.Attributes["name"]
 				}
 			case err := <-errs:
