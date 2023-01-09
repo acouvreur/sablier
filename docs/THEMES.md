@@ -21,7 +21,7 @@ version: 3.9
 
 services:
   sablier:
-    image: ghcr.io/acouvreur/sablier:local
+    image: acouvreur/sablier:local
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '/path/to/my/themes:/etc/sablier/themes'

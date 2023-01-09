@@ -79,7 +79,7 @@ services:
       - './dynamic-config.yml:/etc/traefik/dynamic-config.yml'
 
   sablier:
-    image: ghcr.io/acouvreur/sablier:local
+    image: acouvreur/sablier:local
     command:
       - start
       - --provider.name=docker
