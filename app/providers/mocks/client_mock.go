@@ -311,7 +311,7 @@ type DeploymentMock struct {
 	mock.Mock
 }
 
-func (d DeploymentMock) Get(ctx context.Context, workloadName string, options metav1.GetOptions) (*appsv1.Deployment, error) {
+func (d *DeploymentMock) Get(ctx context.Context, workloadName string, options metav1.GetOptions) (*appsv1.Deployment, error) {
 	args := d.Mock.Called(ctx, workloadName, options)
 	if args.Get(0) != nil {
 		return args.Get(0).(*appsv1.Deployment), args.Error(1)
@@ -319,12 +319,12 @@ func (d DeploymentMock) Get(ctx context.Context, workloadName string, options me
 	return nil, args.Error(1)
 }
 
-func (d DeploymentMock) GetScale(ctx context.Context, workloadName string, options metav1.GetOptions) (*autoscalingv1.Scale, error) {
+func (d *DeploymentMock) GetScale(ctx context.Context, workloadName string, options metav1.GetOptions) (*autoscalingv1.Scale, error) {
 	args := d.Mock.Called(ctx, workloadName, options)
 	return args.Get(0).(*autoscalingv1.Scale), args.Error(1)
 }
 
-func (d DeploymentMock) UpdateScale(ctx context.Context, workloadName string, scale *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error) {
+func (d *DeploymentMock) UpdateScale(ctx context.Context, workloadName string, scale *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error) {
 	args := d.Mock.Called(ctx, workloadName, scale, opts)
 	if args.Get(0) != nil {
 		return args.Get(0).(*autoscalingv1.Scale), args.Error(1)
@@ -341,7 +341,7 @@ type StatefulSetsMock struct {
 	mock.Mock
 }
 
-func (ss StatefulSetsMock) Get(ctx context.Context, workloadName string, options metav1.GetOptions) (*appsv1.StatefulSet, error) {
+func (ss *StatefulSetsMock) Get(ctx context.Context, workloadName string, options metav1.GetOptions) (*appsv1.StatefulSet, error) {
 	args := ss.Mock.Called(ctx, workloadName, options)
 	if args.Get(0) != nil {
 		return args.Get(0).(*appsv1.StatefulSet), args.Error(1)
@@ -349,12 +349,12 @@ func (ss StatefulSetsMock) Get(ctx context.Context, workloadName string, options
 	return nil, args.Error(1)
 }
 
-func (ss StatefulSetsMock) GetScale(ctx context.Context, workloadName string, options metav1.GetOptions) (*autoscalingv1.Scale, error) {
+func (ss *StatefulSetsMock) GetScale(ctx context.Context, workloadName string, options metav1.GetOptions) (*autoscalingv1.Scale, error) {
 	args := ss.Mock.Called(ctx, workloadName, options)
 	return args.Get(0).(*autoscalingv1.Scale), args.Error(1)
 }
 
-func (ss StatefulSetsMock) UpdateScale(ctx context.Context, workloadName string, scale *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error) {
+func (ss *StatefulSetsMock) UpdateScale(ctx context.Context, workloadName string, scale *autoscalingv1.Scale, opts metav1.UpdateOptions) (*autoscalingv1.Scale, error) {
 	args := ss.Mock.Called(ctx, workloadName, scale, opts)
 	if args.Get(0) != nil {
 		return args.Get(0).(*autoscalingv1.Scale), args.Error(1)
