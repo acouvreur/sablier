@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os"
 	"strconv"
 	"sync/atomic"
 	"testing"
@@ -104,6 +105,7 @@ func TestEntries(t *testing.T) {
 }
 
 func TestMarshalJSON(t *testing.T) {
+	os.Setenv("TZ", "")
 	assert := assert.New(t)
 	rg := New[int](0)
 	defer rg.Stop()
