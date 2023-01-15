@@ -24,7 +24,7 @@ services:
         condition: none # Do not restart on setup failure
     
   sablier:
-    image: ghcr.io/acouvreur/sablier:local
+    image: acouvreur/sablier:local
     command:
       - start
       - --provider.name=swarm

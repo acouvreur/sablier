@@ -17,7 +17,7 @@ services:
     restart: "no"
 
   sablier:
-    image: ghcr.io/acouvreur/sablier:local
+    image: acouvreur/sablier:local
     command:
       - start
       - --provider.name=docker

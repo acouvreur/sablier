@@ -19,7 +19,7 @@ spec:
       serviceAccount: sablier
       containers:
       - name: sablier
-        image: ghcr.io/acouvreur/sablier:local
+        image: acouvreur/sablier:local
         args: ["start", "--provider.name=kubernetes", "--logging.level=trace"]
         ports:
         - containerPort: 10000
