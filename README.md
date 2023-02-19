@@ -183,7 +183,7 @@ sablier --help
 # or
 
 docker run acouvreur/sablier[:version] --help
-# ex: docker run acouvreur/sablier:1.3.0-beta.1 --help
+# ex: docker run acouvreur/sablier:1.3.0-beta.3 --help
 ```
 
 All arguments can be used in the form of the config file such as 
@@ -219,7 +219,7 @@ Choose one of the Docker images and run it with one sample configuration file:
 
 ```bash
 docker run -d -p 10000:10000 \
-    -v $PWD/sablier.yml:/etc/sablier/sablier.yml acouvreur/sablier:1.3.0-beta.1
+    -v $PWD/sablier.yml:/etc/sablier/sablier.yml acouvreur/sablier:1.3.0-beta.3
 ```
 
 ### Use the binary distribution
@@ -318,7 +318,7 @@ You can use the command `sablier health` to check for healthiness.
 ```yml
 services:
   sablier:
-    image: acouvreur/sablier:1.3.0-beta.1
+    image: acouvreur/sablier:1.3.0-beta.3
     healthcheck:
       test: ["sablier", "health"]
       interval: 1m30s
