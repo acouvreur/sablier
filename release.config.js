@@ -15,10 +15,10 @@ module.exports = {
       ]
     }],
     ["@semantic-release/exec", {
-      "publishCmd": "make LAST=${lastRelease.version} NEXT=${nextRelease.version} update-doc-version update-doc-version-middleware"
+      "prepareCmd": "make LAST=${lastRelease.version} NEXT=${nextRelease.version} update-doc-version update-doc-version-middleware"
     }],
     ["@semantic-release/git", {
-      "assets": ["**/*.{md,yml}"],
+      "assets": [["**/*.{md,yml}", "!node_modules/**/*.{md,yml}"]],
       "message": "docs(release): update doc version from ${lastRelease.version} to ${nextRelease.version} [skip ci]"
     }]
   ]
