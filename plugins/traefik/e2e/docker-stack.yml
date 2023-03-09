@@ -24,7 +24,7 @@ services:
         condition: none # Do not restart on setup failure
     
   sablier:
-    image: acouvreur/sablier:local
+    image: acouvreur/sablier:1.0.0-beta.1local
     command:
       - start
       - --provider.name=swarm
