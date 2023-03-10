@@ -68,7 +68,7 @@
 
     additionalArguments:
       - "--experimental.plugins.sablier.moduleName=github.com/acouvreur/sablier"
-      - "--experimental.plugins.sablier.version=v1.0.0-beta.11.1.1"
+      - "--experimental.plugins.sablier.version=v1.0.01.0.0-beta.11.1.1"
 
     providers:
       kubernetesIngress:
@@ -152,7 +152,7 @@
           serviceAccount: sablier
           containers:
           - name: sablier
-            image: acouvreur/sablier:1.0.0-beta.11.3.0-beta.3
+            image: acouvreur/sablier:1.0.01.0.0-beta.11.3.0-beta.3
             args: 
             - "start"
             - "--provider.name=kubernetes"
