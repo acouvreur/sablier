@@ -13,7 +13,8 @@ Which allows you to start your containers on demand and shut them down automatic
 - [Sablier](#sablier)
   - [Quick start with Traefik](#quick-start-with-traefik)
   - [Reverse proxies integration plugins](#reverse-proxies-integration-plugins)
-    - [Traefik Middleware Plugin](#traefik-middleware-plugin)
+    - [Traefik](#traefik)
+    - [Nginx](#nginx)
   - [Guides](#guides)
     - [Sablier Guide: Code-Server + Traefik + Kubernetes Ingress](#sablier-guide-code-server--traefik--kubernetes-ingress)
   - [Configuration](#configuration)
@@ -80,13 +81,25 @@ It leverage the API calls to Sablier to your reverse proxy middleware to wake up
 
 ![Reverse Proxy Integration](./docs/img/reverse-proxy-integration.png)
 
-### Traefik Middleware Plugin
+| Reverse Proxy |                          Docker                           | Docker Swarm mode |  Kubernetes   |                          Podman                           |
+| ------------- | :-------------------------------------------------------: | :---------------: | :-----------: | :-------------------------------------------------------: |
+| Traefik       |                             ✅                             |         ✅         | ✅ *(partial)* | [See #70](https://github.com/acouvreur/sablier/issues/70) |
+| Nginx         |                             ✅                             |         ✅         |       ❌       |
+| Apache        | *Coming soon*
+| Caddy         | [See #67](https://github.com/acouvreur/sablier/issues/67) |
+
+### Traefik
 
 See [Traefik Middleware Plugin](https://github.com/acouvreur/sablier/tree/main/plugins/traefik/README.md)
 
 - [Traefik Middleware Plugin with Docker classic](https://github.com/acouvreur/sablier/tree/main/plugins/traefik/README.md#traefik-with-docker-classic)
 - [Traefik Middleware Plugin with Docker Swarm](https://github.com/acouvreur/sablier/tree/main/plugins/traefik/README.md#traefik-with-docker-swarm)
 - [Traefik Middleware Plugin with Kubernetes](https://github.com/acouvreur/sablier/tree/main/plugins/traefik/README.md#traefik-with-kubernetes)
+
+### Nginx
+
+See [Nginx Middleware Plugin](/plugins/nginx/README.md)
+
 
 ## Guides
 
@@ -183,7 +196,7 @@ sablier --help
 # or
 
 docker run acouvreur/sablier[:version] --help
-# ex: docker run acouvreur/sablier:v1.0.0 --help
+# ex: docker run acouvreur/sablier:1.0.0-beta.11.3.0-beta.3 --help
 ```
 
 All arguments can be used in the form of the config file such as 
@@ -219,7 +232,7 @@ Choose one of the Docker images and run it with one sample configuration file:
 
 ```bash
 docker run -d -p 10000:10000 \
-    -v $PWD/sablier.yml:/etc/sablier/sablier.yml acouvreur/sablier:1.1.0
+    -v $PWD/sablier.yml:/etc/sablier/sablier.yml acouvreur/sablier:1.0.0-beta.11.3.0-beta.3
 ```
 
 ### Use the binary distribution
@@ -318,7 +331,7 @@ You can use the command `sablier health` to check for healthiness.
 ```yml
 services:
   sablier:
-    image: acouvreur/sablier:1.2.0
+    image: acouvreur/sablier:1.0.0-beta.11.3.0-beta.3
     healthcheck:
       test: ["sablier", "health"]
       interval: 1m30s

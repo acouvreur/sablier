@@ -19,3 +19,12 @@ $(PLATFORMS):
 
 release: $(PLATFORMS)
 .PHONY: release $(PLATFORMS)
+
+LAST = 0.0.0
+NEXT = 1.0.0
+update-doc-version:
+	find . -type f \( -name "*.md" -o -name "*.yml" \) -exec sed -i 's/acouvreur\/sablier:$(LAST)/acouvreur\/sablier:$(NEXT)/g' {} +
+
+update-doc-version-middleware:
+	find . -type f \( -name "*.md" -o -name "*.yml" \) -exec sed -i 's/version: "v$(LAST)"/version: "v$(NEXT)"/g' {} +
+	find . -type f \( -name "*.md" -o -name "*.yml" \) -exec sed -i 's/version=v$(LAST)/version=v$(NEXT)/g' {} +

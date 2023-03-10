@@ -22,11 +22,6 @@ destroy_kubernetes() {
   docker compose -f $DOCKER_COMPOSE_FILE -p $DOCKER_COMPOSE_PROJECT_NAME down --volumes
 }
 
-prepare_traefik() {
-  helm repo add traefik https://helm.traefik.io/traefik
-  helm repo update
-  helm install traefik traefik/traefik -f values.yaml --namespace kube-system
-}
 
 prepare_deployment() {
   kubectl apply -f ./manifests/sablier.yml
@@ -54,7 +49,7 @@ run_kubernetes_deployment_test() {
   if ! go test -count=1 -tags e2e -timeout 30s -run ^${1}$ github.com/acouvreur/sablier/e2e; then
     errors=1
     kubectl -n kube-system logs deployments/sablier-deployment
-    kubectl -n kube-system logs deployments/traefik
+    # kubectl -n kube-system logs deployments/nginx
   fi
 
   destroy_deployment
@@ -63,10 +58,10 @@ run_kubernetes_deployment_test() {
 trap destroy_kubernetes EXIT
 
 prepare_kubernetes
-prepare_traefik
-run_kubernetes_deployment_test Test_Dynamic
+prepare_nginx # TODO: Implement this, will fail for now
+# run_kubernetes_deployment_test Test_Dynamic
 # run_kubernetes_deployment_test Test_Blocking # Blocking is not yet supported
-run_kubernetes_deployment_test Test_Multiple
-run_kubernetes_deployment_test Test_Healthy
+# run_kubernetes_deployment_test Test_Multiple
+# run_kubernetes_deployment_test Test_Healthy
 
 exit $errors
