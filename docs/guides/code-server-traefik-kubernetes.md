@@ -68,7 +68,7 @@
 
     additionalArguments:
       - "--experimental.plugins.sablier.moduleName=github.com/acouvreur/sablier"
-      - "--experimental.plugins.sablier.version=v1.0.01.0.0-beta.11.1.1"
+      - "--experimental.plugins.sablier.version=v1.3.0"
 
     providers:
       kubernetesIngress:
