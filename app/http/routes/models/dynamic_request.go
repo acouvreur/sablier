@@ -9,6 +9,6 @@ type DynamicRequest struct {
 	ShowDetails      bool          `form:"show_details"`
 	DisplayName      string        `form:"display_name"`
 	Theme            string        `form:"theme"`
-	SessionDuration  time.Duration `form:"session_duration" binding:"required"`
+	SessionDuration  time.Duration `form:"session_duration"`
 	RefreshFrequency time.Duration `form:"refresh_frequency"`
 }

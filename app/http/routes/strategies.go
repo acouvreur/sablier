@@ -28,17 +28,19 @@ type ServeStrategy struct {
 
 	SessionsManager sessions.Manager
 	StrategyConfig  config.Strategy
+	SessionsConfig  config.Sessions
 }
 
-func NewServeStrategy(sessionsManager sessions.Manager, conf config.Strategy) *ServeStrategy {
+func NewServeStrategy(sessionsManager sessions.Manager, strategyConf config.Strategy, sessionsConf config.Sessions) *ServeStrategy {
 
 	serveStrategy := &ServeStrategy{
 		SessionsManager: sessionsManager,
-		StrategyConfig:  conf,
+		StrategyConfig:  strategyConf,
+		SessionsConfig:  sessionsConf,
 	}
 
-	if conf.Dynamic.CustomThemesPath != "" {
-		customThemesFs := osDirFS(conf.Dynamic.CustomThemesPath)
+	if strategyConf.Dynamic.CustomThemesPath != "" {
+		customThemesFs := osDirFS(strategyConf.Dynamic.CustomThemesPath)
 		serveStrategy.customThemesFS = customThemesFs
 		serveStrategy.customThemes = listThemes(customThemesFs)
 	}
@@ -51,6 +53,7 @@ func (s *ServeStrategy) ServeDynamic(c *gin.Context) {
 		Theme:            s.StrategyConfig.Dynamic.DefaultTheme,
 		ShowDetails:      s.StrategyConfig.Dynamic.ShowDetailsByDefault,
 		RefreshFrequency: s.StrategyConfig.Dynamic.DefaultRefreshFrequency,
+		SessionDuration:  s.SessionsConfig.DefaultDuration,
 	}
 
 	if err := c.ShouldBind(&request); err != nil {

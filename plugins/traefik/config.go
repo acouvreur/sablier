@@ -80,13 +80,16 @@ func (c *Config) buildDynamicRequest(middlewareName string) (*http.Request, erro
 
 	q := request.URL.Query()
 
-	_, err = time.ParseDuration(c.SessionDuration)
+	if c.SessionDuration != "" {
+		_, err = time.ParseDuration(c.SessionDuration)
 
-	if err != nil {
-		return nil, fmt.Errorf("error parsing dynamic.sessionDuration: %v", err)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing dynamic.sessionDuration: %v", err)
+		}
+
+		q.Add("session_duration", c.SessionDuration)
 	}
 
-	q.Add("session_duration", c.SessionDuration)
 	for _, name := range c.splittedNames {
 		q.Add("names", name)
 	}
@@ -133,7 +136,16 @@ func (c *Config) buildBlockingRequest() (*http.Request, error) {
 
 	q := request.URL.Query()
 
-	q.Add("session_duration", c.SessionDuration)
+	if c.SessionDuration != "" {
+		_, err = time.ParseDuration(c.SessionDuration)
+
+		if err != nil {
+			return nil, fmt.Errorf("error parsing dynamic.sessionDuration: %v", err)
+		}
+
+		q.Add("session_duration", c.SessionDuration)
+	}
+
 	for _, name := range c.splittedNames {
 		q.Add("names", name)
 	}

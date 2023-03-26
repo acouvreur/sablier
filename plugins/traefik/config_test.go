@@ -27,6 +27,16 @@ func TestConfig_BuildRequest(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "dynamic session with required values",
+			fields: fields{
+				SablierURL: "http://sablier:10000",
+				Names:      "nginx , apache",
+				Dynamic:    &traefik.DynamicConfiguration{},
+			},
+			want:    createRequest("GET", "http://sablier:10000/api/strategies/dynamic?display_name=sablier-middleware&names=nginx&names=apache", nil),
+			wantErr: false,
+		},
+		{
 			name: "dynamic session with default values",
 			fields: fields{
 				SablierURL:      "http://sablier:10000",
@@ -141,6 +151,16 @@ func TestConfig_BuildRequest(t *testing.T) {
 				},
 			},
 			want:    createRequest("GET", "http://sablier:10000/api/strategies/dynamic?display_name=sablier-middleware&names=nginx&names=apache&refresh_frequency=1m&session_duration=1m", nil),
+			wantErr: false,
+		},
+		{
+			name: "blocking session with required values",
+			fields: fields{
+				SablierURL: "http://sablier:10000",
+				Names:      "nginx , apache",
+				Blocking:   &traefik.BlockingConfiguration{},
+			},
+			want:    createRequest("GET", "http://sablier:10000/api/strategies/blocking?names=nginx&names=apache", nil),
 			wantErr: false,
 		},
 		{
