@@ -21,7 +21,7 @@ version: 3.9
 
 services:
   sablier:
-    image: acouvreur/sablier:1.3.0
+    image: acouvreur/sablier:1.3.1-beta.1
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - '/path/to/my/themes:/etc/sablier/themes'
