@@ -8,10 +8,15 @@ import (
 	"github.com/acouvreur/sablier/config"
 )
 
+const enableLabel = "sablier.enable"
+const groupLabel = "sablier.group"
+const defaultGroupValue = "default"
+
 type Provider interface {
 	Start(name string) (instance.State, error)
 	Stop(name string) (instance.State, error)
 	GetState(name string) (instance.State, error)
+	GetGroups() (map[string][]string, error)
 
 	NotifyInstanceStopped(ctx context.Context, instance chan<- string)
 }

@@ -25,6 +25,7 @@ import (
 
 type SessionsManagerMock struct {
 	SessionState sessions.SessionState
+	sessions.Manager
 }
 
 func (s *SessionsManagerMock) RequestSession(names []string, duration time.Duration) *sessions.SessionState {

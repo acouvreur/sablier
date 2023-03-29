@@ -16,6 +16,7 @@ func TestConfig_BuildRequest(t *testing.T) {
 	type fields struct {
 		SablierURL      string
 		Names           string
+		Group           string
 		SessionDuration string
 		Dynamic         *traefik.DynamicConfiguration
 		Blocking        *traefik.BlockingConfiguration
@@ -45,6 +46,17 @@ func TestConfig_BuildRequest(t *testing.T) {
 				Dynamic:         &traefik.DynamicConfiguration{},
 			},
 			want:    createRequest("GET", "http://sablier:10000/api/strategies/dynamic?display_name=sablier-middleware&names=nginx&names=apache&session_duration=1m", nil),
+			wantErr: false,
+		},
+		{
+			name: "dynamic session with group",
+			fields: fields{
+				SablierURL:      "http://sablier:10000",
+				Group:           "default",
+				SessionDuration: "1m",
+				Dynamic:         &traefik.DynamicConfiguration{},
+			},
+			want:    createRequest("GET", "http://sablier:10000/api/strategies/dynamic?display_name=sablier-middleware&group=default&session_duration=1m", nil),
 			wantErr: false,
 		},
 		{
@@ -175,6 +187,17 @@ func TestConfig_BuildRequest(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "blocking session with group",
+			fields: fields{
+				SablierURL:      "http://sablier:10000",
+				Group:           "default",
+				SessionDuration: "1m",
+				Blocking:        &traefik.BlockingConfiguration{},
+			},
+			want:    createRequest("GET", "http://sablier:10000/api/strategies/blocking?group=default&session_duration=1m", nil),
+			wantErr: false,
+		},
+		{
 			name: "blocking session with timeout value",
 			fields: fields{
 				SablierURL:      "http://sablier:10000",
@@ -218,6 +241,7 @@ func TestConfig_BuildRequest(t *testing.T) {
 			c := &traefik.Config{
 				SablierURL:      tt.fields.SablierURL,
 				Names:           tt.fields.Names,
+				Group:           tt.fields.Group,
 				SessionDuration: tt.fields.SessionDuration,
 				Dynamic:         tt.fields.Dynamic,
 				Blocking:        tt.fields.Blocking,

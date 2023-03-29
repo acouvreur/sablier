@@ -69,9 +69,11 @@ func NewKubernetesProvider() (*KubernetesProvider, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &KubernetesProvider{
 		Client: client,
 	}, nil
+
 }
 
 func (provider *KubernetesProvider) Start(name string) (instance.State, error) {
@@ -91,6 +93,32 @@ func (provider *KubernetesProvider) Stop(name string) (instance.State, error) {
 
 	return provider.scale(config, 0)
 
+}
+
+func (provider *KubernetesProvider) GetGroups() (map[string][]string, error) {
+	ctx := context.Background()
+
+	deployments, err := provider.Client.AppsV1().Deployments(core_v1.NamespaceAll).List(ctx, metav1.ListOptions{
+		LabelSelector: enableLabel,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	groups := make(map[string][]string)
+	for _, deployment := range deployments.Items {
+		groupName := deployment.Labels[groupLabel]
+		if len(groupName) == 0 {
+			groupName = defaultGroupValue
+		}
+
+		group := groups[groupName]
+		group = append(group, deployment.Name)
+		groups[groupName] = group
+	}
+
+	return groups, nil
 }
 
 func (provider *KubernetesProvider) scale(config *Config, replicas int32) (instance.State, error) {
@@ -174,10 +202,10 @@ func (provider *KubernetesProvider) getStatefulsetState(config *Config) (instanc
 
 func (provider *KubernetesProvider) NotifyInstanceStopped(ctx context.Context, instance chan<- string) {
 
-	inforemer := provider.watchDeployents(instance)
-	go inforemer.Run(ctx.Done())
-	inforemer = provider.watchStatefulSets(instance)
-	go inforemer.Run(ctx.Done())
+	informer := provider.watchDeployents(instance)
+	go informer.Run(ctx.Done())
+	informer = provider.watchStatefulSets(instance)
+	go informer.Run(ctx.Done())
 }
 
 func (provider *KubernetesProvider) watchDeployents(instance chan<- string) cache.SharedIndexInformer {

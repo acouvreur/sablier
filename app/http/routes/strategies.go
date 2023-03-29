@@ -61,7 +61,17 @@ func (s *ServeStrategy) ServeDynamic(c *gin.Context) {
 		return
 	}
 
-	sessionState := s.SessionsManager.RequestSession(request.Names, request.SessionDuration)
+	var sessionState *sessions.SessionState
+	if len(request.Names) > 0 {
+		sessionState = s.SessionsManager.RequestSession(request.Names, request.SessionDuration)
+	} else {
+		sessionState = s.SessionsManager.RequestSessionGroup(request.Group, request.SessionDuration)
+	}
+
+	if sessionState == nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
 
 	if sessionState.IsReady() {
 		c.Header("X-Sablier-Session-Status", "ready")
@@ -119,7 +129,23 @@ func (s *ServeStrategy) ServeBlocking(c *gin.Context) {
 		return
 	}
 
-	sessionState, err := s.SessionsManager.RequestReadySession(c.Request.Context(), request.Names, request.SessionDuration, request.Timeout)
+	var sessionState *sessions.SessionState
+	var err error
+	if len(request.Names) > 0 {
+		sessionState, err = s.SessionsManager.RequestReadySession(c.Request.Context(), request.Names, request.SessionDuration, request.Timeout)
+	} else {
+		sessionState, err = s.SessionsManager.RequestReadySessionGroup(c.Request.Context(), request.Group, request.SessionDuration, request.Timeout)
+	}
+
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	if sessionState == nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
 
 	if err != nil {
 		c.Header("X-Sablier-Session-Status", "not-ready")

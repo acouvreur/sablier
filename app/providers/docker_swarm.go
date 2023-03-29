@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 
 	"github.com/acouvreur/sablier/app/instance"
 	"github.com/docker/docker/api/types"
@@ -17,6 +18,8 @@ import (
 
 type DockerSwarmProvider struct {
 	Client          client.APIClient
+	updateGroups    chan any
+	groups          *sync.Map
 	desiredReplicas int
 }
 
@@ -28,7 +31,10 @@ func NewDockerSwarmProvider() (*DockerSwarmProvider, error) {
 	return &DockerSwarmProvider{
 		Client:          cli,
 		desiredReplicas: 1,
+		updateGroups:    make(chan any, 1),
+		groups:          &sync.Map{},
 	}, nil
+
 }
 
 func (provider *DockerSwarmProvider) Start(name string) (instance.State, error) {
@@ -66,6 +72,43 @@ func (provider *DockerSwarmProvider) scale(name string, replicas uint64) (instan
 	}
 
 	return instance.NotReadyInstanceState(foundName, 0, provider.desiredReplicas)
+}
+
+func (provider *DockerSwarmProvider) GetGroups() (map[string][]string, error) {
+	ctx := context.Background()
+
+	filters := filters.NewArgs()
+	filters.Add("label", fmt.Sprintf("%s=true", enableLabel))
+
+	services, err := provider.Client.ServiceList(ctx, types.ServiceListOptions{
+		Filters: filters,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	groups := make(map[string][]string)
+	for _, service := range services {
+		groupName := service.Spec.Labels[groupLabel]
+		if len(groupName) == 0 {
+			groupName = defaultGroupValue
+		}
+
+		group := groups[groupName]
+		group = append(group, service.Spec.Name)
+		groups[groupName] = group
+	}
+
+	return groups, nil
+}
+
+func (provider *DockerSwarmProvider) GetGroup(group string) []string {
+	containers, ok := provider.groups.Load(group)
+	if !ok {
+		return []string{}
+	}
+	return containers.([]string)
 }
 
 func (provider *DockerSwarmProvider) GetState(name string) (instance.State, error) {

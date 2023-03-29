@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/acouvreur/sablier/app/instance"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	log "github.com/sirupsen/logrus"
@@ -24,10 +26,42 @@ func NewDockerClassicProvider() (*DockerClassicProvider, error) {
 		log.Fatal(fmt.Errorf("%+v", "Could not connect to docker API"))
 		return nil, err
 	}
+
 	return &DockerClassicProvider{
 		Client:          cli,
 		desiredReplicas: 1,
 	}, nil
+}
+
+func (provider *DockerClassicProvider) GetGroups() (map[string][]string, error) {
+	ctx := context.Background()
+
+	filters := filters.NewArgs()
+	filters.Add("label", fmt.Sprintf("%s=true", enableLabel))
+
+	containers, err := provider.Client.ContainerList(ctx, types.ContainerListOptions{
+		All:     true,
+		Filters: filters,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	groups := make(map[string][]string)
+	for _, container := range containers {
+		groupName := container.Labels[groupLabel]
+		if len(groupName) == 0 {
+			groupName = defaultGroupValue
+		}
+		group := groups[groupName]
+		group = append(group, strings.TrimPrefix(container.Names[0], "/"))
+		groups[groupName] = group
+	}
+
+	log.Debug(fmt.Sprintf("%v", groups))
+
+	return groups, nil
 }
 
 func (provider *DockerClassicProvider) Start(name string) (instance.State, error) {
@@ -111,25 +145,22 @@ func (provider *DockerClassicProvider) NotifyInstanceStopped(ctx context.Context
 	msgs, errs := provider.Client.Events(ctx, types.EventsOptions{
 		Filters: filters.NewArgs(
 			filters.Arg("scope", "local"),
-			filters.Arg("type", "container"),
+			filters.Arg("type", events.ContainerEventType),
 			filters.Arg("event", "die"),
 		),
 	})
-
-	go func() {
-		for {
-			select {
-			case msg := <-msgs:
-				// Send the container that has died to the channel
-				instance <- msg.Actor.Attributes["name"]
-			case err := <-errs:
-				if errors.Is(err, io.EOF) {
-					log.Debug("provider event stream closed")
-					return
-				}
-			case <-ctx.Done():
+	for {
+		select {
+		case msg := <-msgs:
+			// Send the container that has died to the channel
+			instance <- strings.TrimPrefix(msg.Actor.Attributes["name"], "/")
+		case err := <-errs:
+			if errors.Is(err, io.EOF) {
+				log.Debug("provider event stream closed")
 				return
 			}
+		case <-ctx.Done():
+			return
 		}
-	}()
+	}
 }

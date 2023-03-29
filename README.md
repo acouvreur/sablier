@@ -21,6 +21,7 @@ Which allows you to start your containers on demand and shut them down automatic
     - [Configuration File](#configuration-file)
     - [Environment Variables](#environment-variables)
     - [Arguments](#arguments)
+    - [](#)
   - [Install Sablier on its own](#install-sablier-on-its-own)
     - [Use the Docker image](#use-the-docker-image)
     - [Use the binary distribution](#use-the-binary-distribution)
@@ -33,6 +34,10 @@ Which allows you to start your containers on demand and shut them down automatic
   - [Sablier Healthcheck](#sablier-healthcheck)
     - [Using the `/health` route](#using-the-health-route)
     - [Using the `sablier health` command](#using-the-sablier-health-command)
+  - [Autodiscovery using labels](#autodiscovery-using-labels)
+    - [Docker labels](#docker-labels)
+    - [Docker swarm service labels](#docker-swarm-service-labels)
+    - [Kubernetes deployments labels](#kubernetes-deployments-labels)
   - [API](#api)
     - [GET `/api/strategies/dynamic`](#get-apistrategiesdynamic)
     - [GET `/api/strategies/blocking`](#get-apistrategiesblocking)
@@ -85,7 +90,7 @@ It leverage the API calls to Sablier to your reverse proxy middleware to wake up
 | ------------- | :-------------------------------------------------------: | :---------------: | :-----------: | :-------------------------------------------------------: |
 | Traefik       |                             ✅                             |         ✅         | ✅ *(partial)* | [See #70](https://github.com/acouvreur/sablier/issues/70) |
 | Nginx         |                             ✅                             |         ✅         |       ❌       |
-| Apache        | *Coming soon*
+| Apache        |                       *Coming soon*                       |
 | Caddy         | [See #67](https://github.com/acouvreur/sablier/issues/67) |
 
 ### Traefik
@@ -213,6 +218,8 @@ Becomes
 sablier start --strategy.dynamic.custom-themes-path /my/path
 ```
 
+### 
+
 ## Install Sablier on its own
 
 You can install Sablier with the following flavors:
@@ -337,6 +344,68 @@ services:
       interval: 1m30s
 ```
 
+## Autodiscovery using labels
+
+Instead of specifying the names of the instances you want to use, you can take advantage of the labels to specify groups of containers.
+
+- `sablier.enable=true`
+- `sablier.group=mygroup` (*optional*) defaults to "default"
+
+You can then use the API by specifying the group instead of the container names.
+
+```
+curl -X GET -v "http://localhost:10000/api/strategies/blocking?group=mygroup&session_duration=5m&timeout=5s"
+```
+
+### Docker labels
+
+```yaml
+services:
+  whoami:
+    image: containous/whoami:v1.5.0
+    labels:
+      - sablier.enable=true
+      - sablier.group=mygroup
+```
+
+### Docker swarm service labels
+
+```yaml
+services:
+  whoami:
+    image: containous/whoami:v1.5.0
+    deploy:
+      labels:
+        - sablier.enable=true
+        - sablier.group=mygroup
+```
+
+### Kubernetes deployments labels
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami-deployment
+  labels:
+    app: whoami
+    sablier.enable: true
+    sablier.group: mygroup
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      containers:
+      - name: whoami
+        image: containous/whoami:v1.5.0
+```
+
 ## API
 
 To run the following examples you can create two containers:
@@ -348,14 +417,15 @@ To run the following examples you can create two containers:
 
 **Description**: The `/api/strategies/dynamic` endpoint allows you to request a waiting page for multiple instances
 
-| Parameter                        | Value                                                                | Description                                                                      |
-| -------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `names`                          | array of string                                                      | The instances to be started                                                      |
-| `session_duration`               | duration [time.ParseDuration](https://pkg.go.dev/time#ParseDuration) | The session duration for all services, which will reset at each subsequent calls |
-| `show_details` *(optional)*      | bool                                                                 | The details about instances                                                      |
-| `display_name` *(optional)*      | string                                                               | The display name                                                                 |
-| `theme` *(optional)*             | string                                                               | The theme to use                                                                 |
-| `refresh_frequency` *(optional)* | duration [time.ParseDuration](https://pkg.go.dev/time#ParseDuration) | The refresh frequency for the loading page                                       |
+| Parameter                        | Value                                                                | Description                                                                                                     |
+| -------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `names`                          | array of string                                                      | The instances to be started (cannot be used with `group` parameter)                                             |
+| `group`                          | string                                                               | The instance group to be started (using `sablier.group=mygroup` labels) (cannot be used with `names` parameter) |
+| `session_duration`               | duration [time.ParseDuration](https://pkg.go.dev/time#ParseDuration) | The session duration for all services, which will reset at each subsequent calls                                |
+| `show_details` *(optional)*      | bool                                                                 | The details about instances                                                                                     |
+| `display_name` *(optional)*      | string                                                               | The display name                                                                                                |
+| `theme` *(optional)*             | string                                                               | The theme to use                                                                                                |
+| `refresh_frequency` *(optional)* | duration [time.ParseDuration](https://pkg.go.dev/time#ParseDuration) | The refresh frequency for the loading page                                                                      |
 
 Go to http://localhost:10000/api/strategies/dynamic?names=nginx&names=apache&session_duration=5m&show_details=true&display_name=example&theme=hacker-terminal&refresh_frequency=10s and you should see
 
@@ -367,11 +437,12 @@ A special header `X-Sablier-Session-Status` is returned and will have the value 
 
 **Description**: The `/api/strategies/blocking` endpoint allows you to wait until the instances are ready
 
-| Parameter              | Value                                                                | Description                                                                      |
-| ---------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `names`                | array of string                                                      | The instances to be started                                                      |
-| `session_duration`     | duration [time.ParseDuration](https://pkg.go.dev/time#ParseDuration) | The session duration for all services, which will reset at each subsequent calls |
-| `timeout` *(optional)* | duration [time.ParseDuration](https://pkg.go.dev/time#ParseDuration) | The maximum time to wait for instances to be ready                               |
+| Parameter              | Value                                                                | Description                                                                                                     |
+| ---------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `names`                | array of string                                                      | The instances to be started (cannot be used with `group` parameter)                                             |
+| `group`                | string                                                               | The instance group to be started (using `sablier.group=mygroup` labels) (cannot be used with `names` parameter) |
+| `session_duration`     | duration [time.ParseDuration](https://pkg.go.dev/time#ParseDuration) | The session duration for all services, which will reset at each subsequent calls                                |
+| `timeout` *(optional)* | duration [time.ParseDuration](https://pkg.go.dev/time#ParseDuration) | The maximum time to wait for instances to be ready                                                              |
 
 A special header `X-Sablier-Session-Status` is returned and will have the value `ready` if all instances are ready. Or else `not-ready`.
 

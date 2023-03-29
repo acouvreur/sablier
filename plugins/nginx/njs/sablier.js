@@ -22,6 +22,7 @@ function call(r) {
  * @typedef {Object} SablierConfig
  * @property {string} sablierUrl
  * @property {string} names
+ * @property {string} group
  * @property {string} sessionDuration
  * @property {string} internalRedirect
  * @property {string} displayName
@@ -41,6 +42,7 @@ function createConfigurationFromVariables(r) {
   return {
     sablierUrl: r.variables.sablierUrl,
     names: r.variables.sablierNames,
+    group: r.variables.sablierGroup,
     sessionDuration: r.variables.sablierSessionDuration,
     internalRedirect: r.variables.sablierNginxInternalRedirect,
 

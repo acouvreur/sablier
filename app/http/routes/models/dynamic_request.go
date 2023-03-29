@@ -5,7 +5,8 @@ import (
 )
 
 type DynamicRequest struct {
-	Names            []string      `form:"names" binding:"required"`
+	Group            string        `form:"group"`
+	Names            []string      `form:"names"`
 	ShowDetails      bool          `form:"show_details"`
 	DisplayName      string        `form:"display_name"`
 	Theme            string        `form:"theme"`

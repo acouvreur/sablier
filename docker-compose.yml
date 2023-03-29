@@ -31,6 +31,11 @@ services:
       - traefik.http.middlewares.blocking.plugin.sablier.sablierUrl=http://sablier:10000
       - traefik.http.middlewares.blocking.plugin.sablier.sessionDuration=1m
       - traefik.http.middlewares.blocking.plugin.sablier.blocking.timeout=30s
+      # Blocking Middleware
+      - traefik.http.middlewares.blocking.plugin.sablier.group=sablier
+      - traefik.http.middlewares.blocking.plugin.sablier.sablierUrl=http://sablier:10000
+      - traefik.http.middlewares.blocking.plugin.sablier.sessionDuration=1m
+      - traefik.http.middlewares.blocking.plugin.sablier.blocking.timeout=30s
 
   whoami:
     image: containous/whoami:v1.5.0
@@ -40,3 +45,6 @@ services:
     #  - traefik.enable
     #  - traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)
     #  - traefik.http.routers.whoami.middlewares=dynamic@docker
+    labels:
+      - sablier.enable=true
+      - sablier.group=whoami
