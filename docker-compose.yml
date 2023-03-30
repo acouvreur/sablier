@@ -22,12 +22,12 @@ services:
     labels:
       - traefik.enable=true
       # Dynamic Middleware
-      - traefik.http.middlewares.dynamic.plugin.sablier.names=sablier-whoami-1
+      - traefik.http.middlewares.dynamic.plugin.sablier.names=sablier_whoami_1
       - traefik.http.middlewares.dynamic.plugin.sablier.sablierUrl=http://sablier:10000
       - traefik.http.middlewares.dynamic.plugin.sablier.sessionDuration=1m
       - traefik.http.middlewares.dynamic.plugin.sablier.dynamic.theme=hacker-terminal
       # Blocking Middleware
-      - traefik.http.middlewares.blocking.plugin.sablier.names=sablier-whoami-1
+      - traefik.http.middlewares.blocking.plugin.sablier.names=sablier_whoami_1
       - traefik.http.middlewares.blocking.plugin.sablier.sablierUrl=http://sablier:10000
       - traefik.http.middlewares.blocking.plugin.sablier.sessionDuration=1m
       - traefik.http.middlewares.blocking.plugin.sablier.blocking.timeout=30s
