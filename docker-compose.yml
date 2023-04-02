@@ -31,11 +31,11 @@ services:
       - traefik.http.middlewares.blocking.plugin.sablier.sablierUrl=http://sablier:10000
       - traefik.http.middlewares.blocking.plugin.sablier.sessionDuration=1m
       - traefik.http.middlewares.blocking.plugin.sablier.blocking.timeout=30s
-      # Blocking Middleware
-      - traefik.http.middlewares.blocking.plugin.sablier.group=sablier
-      - traefik.http.middlewares.blocking.plugin.sablier.sablierUrl=http://sablier:10000
-      - traefik.http.middlewares.blocking.plugin.sablier.sessionDuration=1m
-      - traefik.http.middlewares.blocking.plugin.sablier.blocking.timeout=30s
+      # Group Middleware
+      - traefik.http.middlewares.group.plugin.sablier.group=sablier
+      - traefik.http.middlewares.group.plugin.sablier.sablierUrl=http://sablier:10000
+      - traefik.http.middlewares.group.plugin.sablier.sessionDuration=1m
+      - traefik.http.middlewares.group.plugin.sablier.blocking.timeout=30s
 
   whoami:
     image: containous/whoami:v1.5.0
