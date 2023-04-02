@@ -19,7 +19,6 @@ Which allows you to start your containers on demand and shut them down automatic
     - [Configuration File](#configuration-file)
     - [Environment Variables](#environment-variables)
     - [Arguments](#arguments)
-    - [](#)
   - [Install Sablier on its own](#install-sablier-on-its-own)
     - [Use the Docker image](#use-the-docker-image)
     - [Use the binary distribution](#use-the-binary-distribution)
@@ -84,11 +83,11 @@ It leverage the API calls to Sablier to your reverse proxy middleware to wake up
 
 ![Reverse Proxy Integration](./docs/img/reverse-proxy-integration.png)
 
-| Reverse Proxy                 |    Docker     | Docker Swarm mode |  Kubernetes   |                          Podman                           |
-| ----------------------------- | :-----------: | :---------------: | :-----------: | :-------------------------------------------------------: |
-| [Traefik](./plugins/traefik/) |       ✅       |         ✅         | ✅ *(partial)* | [See #70](https://github.com/acouvreur/sablier/issues/70) |
-| [Nginx](./plugins/nginx/)     |       ✅       |         ✅         |       ❌       |
-| [Caddy](./plugins/caddy/)     |       ✅       |         ✅         |       ❌       |
+| Reverse Proxy                 | Docker | Docker Swarm mode |  Kubernetes   |                          Podman                           |
+| ----------------------------- | :----: | :---------------: | :-----------: | :-------------------------------------------------------: |
+| [Traefik](./plugins/traefik/) |   ✅    |         ✅         | ✅ *(partial)* | [See #70](https://github.com/acouvreur/sablier/issues/70) |
+| [Nginx](./plugins/nginx/)     |   ✅    |         ✅         |       ❌       |
+| [Caddy](./plugins/caddy/)     |   ✅    |         ✅         |       ❌       |
 
 
 ## Guides
@@ -202,8 +201,6 @@ Becomes
 ```bash
 sablier start --strategy.dynamic.custom-themes-path /my/path
 ```
-
-### 
 
 ## Install Sablier on its own
 
