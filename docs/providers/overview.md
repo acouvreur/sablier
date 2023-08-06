@@ -12,11 +12,11 @@ A Provider typically have the following capabilities:
 
 ## Available providers
 
-|       | Provider                                    | Name        | Details                                                  |
+|       | Provider                                | Name           | Details                                                  |
 | :---: | --------------------------------------- | -------------- | -------------------------------------------------------- |
 |       | [Docker](/providers/docker)             | `docker`       | Stop and start containers on demand                      |
 |       | [Docker Swarm](/providers/docker_swarm) | `docker_swarm` | Scale down to zero and up services on demand             |
-|       | [Docker](/providers/kubernetes)         | `kubernetes`   | Scale down and up deployments and statefulsets on demand |
+|       | [Kubernetes](/providers/kubernetes)     | `kubernetes`   | Scale down and up deployments and statefulsets on demand |
 |       | [Podman](/providers/podman)             | `podman`       | Work in progress                                         |
 |       | [EC2](/providers/ec2)                   | `ec2`          | Work in progress                                         |
 |       | [Systemd](/providers/systemd)           | `systemd`      | Work in progress                                         |
