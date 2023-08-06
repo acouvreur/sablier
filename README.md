@@ -28,8 +28,8 @@ Either because you don't want to overload your raspberry pi or because your QA e
   - Traefik
   - Caddy
 - Scale up your workload automatically upon the first request
-  - [with a themable waiting page]()
-  - [with a hanging request (hang until service is up)]()
+  - [with a themable waiting page](https://acouvreur.github.io/sablier/#/themes)
+  - [with a hanging request (hang until service is up)](https://acouvreur.github.io/sablier/#/strategies?id=blocking-strategy)
 - Scale your workload to zero automatically after a period of inactivity
 
 ## 📝 Documentation
