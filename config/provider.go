@@ -7,7 +7,15 @@ import (
 // Provider holds the provider description
 // It can be either docker, swarm or kubernetes
 type Provider struct {
-	Name string `mapstructure:"NAME" yaml:"provider,omitempty"`
+	Name       string `mapstructure:"NAME" yaml:"provider,omitempty"`
+	Kubernetes Kubernetes
+}
+
+type Kubernetes struct {
+	//QPS limit for  K8S API access client-side throttle
+	QPS float32 `mapstructure:"QPS" yaml:"QPS" default:"5"`
+	//Maximum burst for client-side throttle
+	Burst int `mapstructure:"BURST" yaml:"Burst" default:"10"`
 }
 
 var providers = []string{"docker", "swarm", "kubernetes"}
@@ -15,6 +23,10 @@ var providers = []string{"docker", "swarm", "kubernetes"}
 func NewProviderConfig() Provider {
 	return Provider{
 		Name: "docker",
+		Kubernetes: Kubernetes{
+			QPS:   5,
+			Burst: 10,
+		},
 	}
 }
 

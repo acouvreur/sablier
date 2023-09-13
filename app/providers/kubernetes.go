@@ -12,6 +12,8 @@ import (
 	core_v1 "k8s.io/api/core/v1"
 
 	"github.com/acouvreur/sablier/app/instance"
+	providerConfig "github.com/acouvreur/sablier/config"
+	log "github.com/sirupsen/logrus"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
@@ -60,12 +62,18 @@ type KubernetesProvider struct {
 	Client kubernetes.Interface
 }
 
-func NewKubernetesProvider() (*KubernetesProvider, error) {
-	config, err := rest.InClusterConfig()
+func NewKubernetesProvider(providerConfig providerConfig.Kubernetes) (*KubernetesProvider, error) {
+	kubeclientConfig, err := rest.InClusterConfig()
+
+	kubeclientConfig.QPS = providerConfig.QPS
+	kubeclientConfig.Burst = providerConfig.Burst
+
+	log.Debug(fmt.Sprintf("Provider configuration:  QPS=%v, Burst=%v", kubeclientConfig.QPS, kubeclientConfig.Burst))
+
 	if err != nil {
 		return nil, err
 	}
-	client, err := kubernetes.NewForConfig(config)
+	client, err := kubernetes.NewForConfig(kubeclientConfig)
 	if err != nil {
 		return nil, err
 	}
