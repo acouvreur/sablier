@@ -87,7 +87,7 @@ sablier --help
 # or
 
 docker run acouvreur/sablier[:version] --help
-# ex: docker run acouvreur/sablier:1.4.0-beta.9 --help
+# ex: docker run acouvreur/sablier:1.4.0-beta.10 --help
 ```
 
 All arguments can be used in the form of the config file such as 
