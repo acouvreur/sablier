@@ -22,6 +22,7 @@ type BlockingConfiguration struct {
 type Config struct {
 	SablierURL      string `yaml:"sablierUrl"`
 	Names           string `yaml:"names"`
+	Group           string `yaml:"group"`
 	SessionDuration string `yaml:"sessionDuration"`
 	splittedNames   []string
 	Dynamic         *DynamicConfiguration  `yaml:"dynamic"`
@@ -32,6 +33,7 @@ func CreateConfig() *Config {
 	return &Config{
 		SablierURL:      "http://sablier:10000",
 		Names:           "",
+		Group:           "",
 		SessionDuration: "",
 		splittedNames:   []string{},
 		Dynamic:         nil,
@@ -50,10 +52,12 @@ func (c *Config) BuildRequest(middlewareName string) (*http.Request, error) {
 		names[i] = strings.TrimSpace(names[i])
 	}
 
-	c.splittedNames = names
+	if len(names) >= 1 && len(names[0]) > 0 {
+		c.splittedNames = names
+	}
 
-	if len(names) == 0 {
-		return nil, fmt.Errorf("you must specify at least one name")
+	if len(names) == 0 && len(c.Group) == 0 {
+		return nil, fmt.Errorf("you must specify at least one name or a group")
 	}
 
 	if c.Dynamic != nil && c.Blocking != nil {
@@ -80,15 +84,22 @@ func (c *Config) buildDynamicRequest(middlewareName string) (*http.Request, erro
 
 	q := request.URL.Query()
 
-	_, err = time.ParseDuration(c.SessionDuration)
+	if c.SessionDuration != "" {
+		_, err = time.ParseDuration(c.SessionDuration)
 
-	if err != nil {
-		return nil, fmt.Errorf("error parsing dynamic.sessionDuration: %v", err)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing dynamic.sessionDuration: %v", err)
+		}
+
+		q.Add("session_duration", c.SessionDuration)
 	}
 
-	q.Add("session_duration", c.SessionDuration)
 	for _, name := range c.splittedNames {
 		q.Add("names", name)
+	}
+
+	if c.Group != "" {
+		q.Add("group", c.Group)
 	}
 
 	if c.Dynamic.DisplayName != "" {
@@ -133,9 +144,22 @@ func (c *Config) buildBlockingRequest() (*http.Request, error) {
 
 	q := request.URL.Query()
 
-	q.Add("session_duration", c.SessionDuration)
+	if c.SessionDuration != "" {
+		_, err = time.ParseDuration(c.SessionDuration)
+
+		if err != nil {
+			return nil, fmt.Errorf("error parsing dynamic.sessionDuration: %v", err)
+		}
+
+		q.Add("session_duration", c.SessionDuration)
+	}
+
 	for _, name := range c.splittedNames {
 		q.Add("names", name)
+	}
+
+	if c.Group != "" {
+		q.Add("group", c.Group)
 	}
 
 	if c.Blocking.Timeout != "" {

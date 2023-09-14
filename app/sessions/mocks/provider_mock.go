@@ -53,6 +53,10 @@ func (provider *ProviderMock) GetState(name string) (instance.State, error) {
 	return args.Get(0).(instance.State), args.Error(1)
 }
 
+func (provider *ProviderMock) GetGroups() (map[string][]string, error) {
+	return make(map[string][]string), nil
+}
+
 type KVMock[T any] struct {
 	wg sync.WaitGroup
 

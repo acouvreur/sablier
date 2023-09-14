@@ -17,7 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Start(serverConf config.Server, strategyConf config.Strategy, sessionManager sessions.Manager) {
+func Start(serverConf config.Server, strategyConf config.Strategy, sessionsConf config.Sessions, sessionManager sessions.Manager) {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
@@ -29,7 +29,7 @@ func Start(serverConf config.Server, strategyConf config.Strategy, sessionManage
 	{
 		api := base.Group("/api")
 		{
-			strategy := routes.NewServeStrategy(sessionManager, strategyConf)
+			strategy := routes.NewServeStrategy(sessionManager, strategyConf, sessionsConf)
 			api.GET("/strategies/dynamic", strategy.ServeDynamic)
 			api.GET("/strategies/dynamic/themes", strategy.ServeDynamicThemes)
 			api.GET("/strategies/blocking", strategy.ServeBlocking)

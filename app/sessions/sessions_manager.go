@@ -14,9 +14,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const defaultRefreshFrequency = 2 * time.Second
+
 type Manager interface {
 	RequestSession(names []string, duration time.Duration) *SessionState
+	RequestSessionGroup(group string, duration time.Duration) *SessionState
 	RequestReadySession(ctx context.Context, names []string, duration time.Duration, timeout time.Duration) (*SessionState, error)
+	RequestReadySessionGroup(ctx context.Context, group string, duration time.Duration, timeout time.Duration) (*SessionState, error)
 
 	LoadSessions(io.ReadCloser) error
 	SaveSessions(io.WriteCloser) error
@@ -25,36 +29,58 @@ type Manager interface {
 }
 
 type SessionsManager struct {
-	events context.Context
+	ctx    context.Context
 	cancel context.CancelFunc
 
-	store           tinykv.KV[instance.State]
-	provider        providers.Provider
-	instanceStopped chan string
+	store    tinykv.KV[instance.State]
+	provider providers.Provider
+	groups   map[string][]string
 }
 
 func NewSessionsManager(store tinykv.KV[instance.State], provider providers.Provider) Manager {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	groups, err := provider.GetGroups()
+	if err != nil {
+		groups = make(map[string][]string)
+		log.Warn("could not get groups", err)
+	}
+
+	sm := &SessionsManager{
+		ctx:      ctx,
+		cancel:   cancel,
+		store:    store,
+		provider: provider,
+		groups:   groups,
+	}
+
+	sm.initWatchers()
+
+	return sm
+}
+
+func (sm *SessionsManager) initWatchers() {
+	updateGroups := make(chan map[string][]string)
+	go watchGroups(sm.ctx, sm.provider, defaultRefreshFrequency, updateGroups)
+	go sm.consumeGroups(updateGroups)
 
 	instanceStopped := make(chan string)
+	go sm.provider.NotifyInstanceStopped(sm.ctx, instanceStopped)
+	go sm.consumeInstanceStopped(instanceStopped)
+}
 
-	go func() {
-		for instance := range instanceStopped {
-			// Will delete from the store containers that have been stop either by external sources
-			// or by the internal expiration loop, if the deleted entry does not exist, it doesn't matter
-			log.Debugf("received event instance %s is stopped, removing from store", instance)
-			store.Delete(instance)
-		}
-	}()
+func (sm *SessionsManager) consumeGroups(receive chan map[string][]string) {
+	for groups := range receive {
+		sm.groups = groups
+	}
+}
 
-	events, cancel := context.WithCancel(context.Background())
-	provider.NotifyInstanceStopped(events, instanceStopped)
-
-	return &SessionsManager{
-		events:          events,
-		cancel:          cancel,
-		store:           store,
-		provider:        provider,
-		instanceStopped: instanceStopped,
+func (sm *SessionsManager) consumeInstanceStopped(instanceStopped chan string) {
+	for instance := range instanceStopped {
+		// Will delete from the store containers that have been stop either by external sources
+		// or by the internal expiration loop, if the deleted entry does not exist, it doesn't matter
+		log.Debugf("received event instance %s is stopped, removing from store", instance)
+		sm.store.Delete(instance)
 	}
 }
 
@@ -134,6 +160,21 @@ func (s *SessionsManager) RequestSession(names []string, duration time.Duration)
 	wg.Wait()
 
 	return sessionState
+}
+
+func (s *SessionsManager) RequestSessionGroup(group string, duration time.Duration) (sessionState *SessionState) {
+
+	if len(group) == 0 {
+		return nil
+	}
+
+	names := s.groups[group]
+
+	if len(names) == 0 {
+		return nil
+	}
+
+	return s.RequestSession(names, duration)
 }
 
 func (s *SessionsManager) requestSessionInstance(name string, duration time.Duration) (*instance.State, error) {
@@ -217,6 +258,21 @@ func (s *SessionsManager) RequestReadySession(ctx context.Context, names []strin
 	}
 }
 
+func (s *SessionsManager) RequestReadySessionGroup(ctx context.Context, group string, duration time.Duration, timeout time.Duration) (sessionState *SessionState, err error) {
+
+	if len(group) == 0 {
+		return nil, fmt.Errorf("group is mandatory")
+	}
+
+	names := s.groups[group]
+
+	if len(names) == 0 {
+		return nil, fmt.Errorf("group has no member")
+	}
+
+	return s.RequestReadySession(ctx, names, duration, timeout)
+}
+
 func (s *SessionsManager) ExpiresAfter(instance *instance.State, duration time.Duration) {
 	s.store.Put(instance.Name, *instance, duration)
 }
@@ -224,9 +280,6 @@ func (s *SessionsManager) ExpiresAfter(instance *instance.State, duration time.D
 func (s *SessionsManager) Stop() {
 	// Stop event listeners
 	s.cancel()
-
-	// Stop receiving stopped instance
-	close(s.instanceStopped)
 
 	// Stop the store
 	s.store.Stop()

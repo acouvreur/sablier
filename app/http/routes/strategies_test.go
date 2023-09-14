@@ -25,6 +25,7 @@ import (
 
 type SessionsManagerMock struct {
 	SessionState sessions.SessionState
+	sessions.Manager
 }
 
 func (s *SessionsManagerMock) RequestSession(names []string, duration time.Duration) *sessions.SessionState {
@@ -264,7 +265,8 @@ func createMap(instances []*instance.State) (store *sync.Map) {
 func TestNewServeStrategy(t *testing.T) {
 	type args struct {
 		sessionsManager sessions.Manager
-		conf            config.Strategy
+		strategyConf    config.Strategy
+		sessionsConf    config.Sessions
 	}
 	tests := []struct {
 		name    string
@@ -276,7 +278,7 @@ func TestNewServeStrategy(t *testing.T) {
 			name: "load custom themes",
 			args: args{
 				sessionsManager: &SessionsManagerMock{},
-				conf: config.Strategy{
+				strategyConf: config.Strategy{
 					Dynamic: config.DynamicStrategy{
 						CustomThemesPath: "my/path/to/themes",
 					},
@@ -295,7 +297,7 @@ func TestNewServeStrategy(t *testing.T) {
 			name: "load custom themes recursively",
 			args: args{
 				sessionsManager: &SessionsManagerMock{},
-				conf: config.Strategy{
+				strategyConf: config.Strategy{
 					Dynamic: config.DynamicStrategy{
 						CustomThemesPath: "my/path/to/themes",
 					},
@@ -316,7 +318,7 @@ func TestNewServeStrategy(t *testing.T) {
 			name: "do not load custom themes outside of path",
 			args: args{
 				sessionsManager: &SessionsManagerMock{},
-				conf: config.Strategy{
+				strategyConf: config.Strategy{
 					Dynamic: config.DynamicStrategy{
 						CustomThemesPath: "my/path/to/themes",
 					},
@@ -353,7 +355,7 @@ func TestNewServeStrategy(t *testing.T) {
 
 			osDirFS = myOsDirFS
 
-			if got := NewServeStrategy(tt.args.sessionsManager, tt.args.conf); !reflect.DeepEqual(got.customThemes, tt.want) {
+			if got := NewServeStrategy(tt.args.sessionsManager, tt.args.strategyConf, tt.args.sessionsConf); !reflect.DeepEqual(got.customThemes, tt.want) {
 				t.Errorf("NewServeStrategy() = %v, want %v", got.customThemes, tt.want)
 			}
 		})
@@ -363,6 +365,7 @@ func TestNewServeStrategy(t *testing.T) {
 func TestServeStrategy_ServeDynamicThemes(t *testing.T) {
 	type fields struct {
 		StrategyConfig config.Strategy
+		SessionsConfig config.Sessions
 	}
 	tests := []struct {
 		name     string
@@ -428,7 +431,7 @@ func TestServeStrategy_ServeDynamicThemes(t *testing.T) {
 
 			osDirFS = myOsDirFS
 
-			s := NewServeStrategy(nil, tt.fields.StrategyConfig)
+			s := NewServeStrategy(nil, tt.fields.StrategyConfig, tt.fields.SessionsConfig)
 
 			recorder := httptest.NewRecorder()
 			c := GetTestGinContext(recorder)

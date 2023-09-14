@@ -69,6 +69,7 @@ You can configure the middleware behavior with the following variables:
 
 - `set $sablierUrl` The internal routing to reach Sablier API
 - `set $sablierNames` Comma separated names of containers/services/deployments etc.
+- `set $sablierGroup` Group name to use to filter by label, ignored if sablierNames is set
 - `set $sablierSessionDuration` The session duration after which containers/services/deployments instances are shutdown
 - `set $sablierNginxInternalRedirect` The internal location for the service to redirect e.g. @nginx
 

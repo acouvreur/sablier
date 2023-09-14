@@ -7,7 +7,6 @@ import (
 	"os"
 	"sort"
 	"strings"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -28,17 +27,19 @@ type ServeStrategy struct {
 
 	SessionsManager sessions.Manager
 	StrategyConfig  config.Strategy
+	SessionsConfig  config.Sessions
 }
 
-func NewServeStrategy(sessionsManager sessions.Manager, conf config.Strategy) *ServeStrategy {
+func NewServeStrategy(sessionsManager sessions.Manager, strategyConf config.Strategy, sessionsConf config.Sessions) *ServeStrategy {
 
 	serveStrategy := &ServeStrategy{
 		SessionsManager: sessionsManager,
-		StrategyConfig:  conf,
+		StrategyConfig:  strategyConf,
+		SessionsConfig:  sessionsConf,
 	}
 
-	if conf.Dynamic.CustomThemesPath != "" {
-		customThemesFs := osDirFS(conf.Dynamic.CustomThemesPath)
+	if strategyConf.Dynamic.CustomThemesPath != "" {
+		customThemesFs := osDirFS(strategyConf.Dynamic.CustomThemesPath)
 		serveStrategy.customThemesFS = customThemesFs
 		serveStrategy.customThemes = listThemes(customThemesFs)
 	}
@@ -51,6 +52,7 @@ func (s *ServeStrategy) ServeDynamic(c *gin.Context) {
 		Theme:            s.StrategyConfig.Dynamic.DefaultTheme,
 		ShowDetails:      s.StrategyConfig.Dynamic.ShowDetailsByDefault,
 		RefreshFrequency: s.StrategyConfig.Dynamic.DefaultRefreshFrequency,
+		SessionDuration:  s.SessionsConfig.DefaultDuration,
 	}
 
 	if err := c.ShouldBind(&request); err != nil {
@@ -58,7 +60,17 @@ func (s *ServeStrategy) ServeDynamic(c *gin.Context) {
 		return
 	}
 
-	sessionState := s.SessionsManager.RequestSession(request.Names, request.SessionDuration)
+	var sessionState *sessions.SessionState
+	if len(request.Names) > 0 {
+		sessionState = s.SessionsManager.RequestSession(request.Names, request.SessionDuration)
+	} else {
+		sessionState = s.SessionsManager.RequestSessionGroup(request.Group, request.SessionDuration)
+	}
+
+	if sessionState == nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
 
 	if sessionState.IsReady() {
 		c.Header("X-Sablier-Session-Status", "ready")
@@ -74,7 +86,7 @@ func (s *ServeStrategy) ServeDynamic(c *gin.Context) {
 		CustomThemes:        s.customThemesFS,
 		AllowedCustomThemes: s.customThemes,
 		Version:             version.Version,
-		RefreshFrequency:    5 * time.Second,
+		RefreshFrequency:    request.RefreshFrequency,
 		InstanceStates:      sessionStateToRenderOptionsInstanceState(sessionState),
 	}
 
@@ -116,7 +128,23 @@ func (s *ServeStrategy) ServeBlocking(c *gin.Context) {
 		return
 	}
 
-	sessionState, err := s.SessionsManager.RequestReadySession(c.Request.Context(), request.Names, request.SessionDuration, request.Timeout)
+	var sessionState *sessions.SessionState
+	var err error
+	if len(request.Names) > 0 {
+		sessionState, err = s.SessionsManager.RequestReadySession(c.Request.Context(), request.Names, request.SessionDuration, request.Timeout)
+	} else {
+		sessionState, err = s.SessionsManager.RequestReadySessionGroup(c.Request.Context(), request.Group, request.SessionDuration, request.Timeout)
+	}
+
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	if sessionState == nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
 
 	if err != nil {
 		c.Header("X-Sablier-Session-Status", "not-ready")

@@ -17,6 +17,19 @@ GO_LDFLAGS := -X $(VPREFIX).Branch=$(GIT_BRANCH) -X $(VPREFIX).Version=$(VERSION
 $(PLATFORMS):
 	CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -tags=nomsgpack -v -ldflags="${GO_LDFLAGS}" -o 'sablier_$(VERSION)_$(os)-$(arch)' .
 
+build:
+	go build -v .
+
+test:
+	go test -v ./...
+
+.PHONY: docker
+docker:
+	docker build -t acouvreur/sablier:local .
+
+caddy:
+	docker build -t caddy:local plugins/caddy
+
 release: $(PLATFORMS)
 .PHONY: release $(PLATFORMS)
 
@@ -28,3 +41,47 @@ update-doc-version:
 update-doc-version-middleware:
 	find . -type f \( -name "*.md" -o -name "*.yml" \) -exec sed -i 's/version: "v$(LAST)"/version: "v$(NEXT)"/g' {} +
 	find . -type f \( -name "*.md" -o -name "*.yml" \) -exec sed -i 's/version=v$(LAST)/version=v$(NEXT)/g' {} +
+	sed -i 's/SABLIER_VERSION=v$(LAST)/SABLIER_VERSION=v$(NEXT)/g' plugins/caddy/Dockerfile.remote
+	sed -i 's/v$(LAST)/v$(NEXT)/g' plugins/caddy/README.md
+
+docs:
+	docsify serve docs
+
+# End to end tests
+e2e: e2e-caddy e2e-nginx e2e-traefik
+
+## Caddy
+e2e-caddy-docker:
+	cd plugins/caddy/e2e/docker && bash ./run.sh
+	
+e2e-caddy-swarm:
+	cd plugins/caddy/e2e/docker_swarm && bash ./run.sh
+
+# e2e-caddy-kubernetes:
+#   	cd plugins/caddy/e2e/kubernetes && bash ./run.sh
+
+e2e-caddy: e2e-caddy-docker e2e-caddy-swarm # e2e-caddy-kubernetes
+
+## NGinx
+e2e-nginx-docker:
+	cd plugins/nginx/e2e/docker && bash ./run.sh
+	
+e2e-nginx-swarm:
+	cd plugins/nginx/e2e/docker_swarm && bash ./run.sh
+
+e2e-nginx-kubernetes:
+	cd plugins/nginx/e2e/kubernetes && bash ./run.sh
+
+e2e-nginx: e2e-nginx-docker e2e-nginx-swarm e2e-nginx-kubernetes
+
+## Traefik
+e2e-traefik-docker:
+	cd plugins/traefik/e2e/docker && bash ./run.sh
+	
+e2e-traefik-swarm:
+	cd plugins/traefik/e2e/docker_swarm && bash ./run.sh
+
+e2e-traefik-kubernetes:
+	cd plugins/traefik/e2e/kubernetes && bash ./run.sh
+
+e2e-traefik: e2e-traefik-docker e2e-traefik-swarm e2e-traefik-kubernetes

@@ -47,7 +47,7 @@ func Start(conf config.Config) error {
 		loadSessions(storage, sessionsManager)
 	}
 
-	http.Start(conf.Server, conf.Strategy, sessionsManager)
+	http.Start(conf.Server, conf.Strategy, conf.Sessions, sessionsManager)
 
 	return nil
 }
