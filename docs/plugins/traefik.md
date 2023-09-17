@@ -105,7 +105,7 @@ experimental:
 
 ```bash
 --experimental.plugins.sablier.modulename=github.com/acouvreur/sablier
---experimental.plugins.sablier.version=v1.4.0-beta.11
+--experimental.plugins.sablier.version=v1.4.1-beta.1-beta.11
 ```
 
 <!-- tabs:end -->
