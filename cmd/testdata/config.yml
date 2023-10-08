@@ -1,5 +1,8 @@
 provider:
   name: configfile
+  kubernetes:
+    qps: 64
+    burst: 128
 server:
   port: 1111
   base-path: /configfile/

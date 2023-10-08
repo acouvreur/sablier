@@ -80,6 +80,8 @@ func TestPrecedence(t *testing.T) {
 			"--configFile", filepath.Join(testDir, "testdata", "config.yml"),
 			"start",
 			"--provider.name", "cli",
+			"--provider.kubernetes.qps", "256",
+			"--provider.kubernetes.burst", "512",
 			"--server.port", "3333",
 			"--server.base-path", "/cli/",
 			"--storage.file", "/tmp/cli.json",

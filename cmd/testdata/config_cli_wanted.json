@@ -7,7 +7,11 @@
     "File": "/tmp/cli.json"
   },
   "Provider": {
-    "Name": "cli"
+    "Name": "cli",
+    "Kubernetes": {
+      "QPS": 256,
+      "Burst": 512
+    }
   },
   "Sessions": {
     "DefaultDuration": 10800000000000,
