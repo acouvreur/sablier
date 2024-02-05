@@ -138,7 +138,7 @@ func (provider *DockerClassicProvider) NotifyInstanceStopped(ctx context.Context
 	msgs, errs := provider.Client.Events(ctx, types.EventsOptions{
 		Filters: filters.NewArgs(
 			filters.Arg("scope", "local"),
-			filters.Arg("type", events.ContainerEventType),
+			filters.Arg("type", string(events.ContainerEventType)),
 			filters.Arg("event", "die"),
 		),
 	})
