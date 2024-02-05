@@ -1,5 +1,15 @@
+documentation:
+- changed-files:
+  - any-glob-to-any-file: 'docs/**'
+
 reverse-proxy:
-- plugins/**
+- changed-files:
+  - any-glob-to-any-file: 'plugins/**'
 
 provider:
-- app/providers/**
+- changed-files:
+  - any-glob-to-any-file: 'app/providers/**'
+
+ci:
+- changed-files:
+  - any-glob-to-any-file: '.github/**'

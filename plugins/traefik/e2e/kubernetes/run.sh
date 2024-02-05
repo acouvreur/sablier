@@ -65,7 +65,7 @@ trap destroy_kubernetes EXIT
 prepare_kubernetes
 prepare_traefik
 run_kubernetes_deployment_test Test_Dynamic
-# run_kubernetes_deployment_test Test_Blocking # Blocking is not yet supported
+run_kubernetes_deployment_test Test_Blocking
 run_kubernetes_deployment_test Test_Multiple
 run_kubernetes_deployment_test Test_Healthy
 

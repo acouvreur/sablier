@@ -17,18 +17,18 @@ jobs:
           persist-credentials: false
 
       - name: Set up Go 1.21
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
          go-version: ^1.21
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
         
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          npm i -G semantic-release @semantic-release/exec @semantic-release/git
+          npm i -G semantic-release@~23.0.0 @semantic-release/exec@~6.0.3 @semantic-release/git@~10.0.1
           npx semantic-release

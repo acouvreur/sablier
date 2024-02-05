@@ -7,7 +7,11 @@
     "File": "/tmp/configfile.json"
   },
   "Provider": {
-    "Name": "configfile"
+    "Name": "configfile",
+    "Kubernetes": {
+      "QPS": 64,
+      "Burst": 128
+    }
   },
   "Sessions": {
     "DefaultDuration": 3600000000000,

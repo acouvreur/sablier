@@ -7,7 +7,11 @@
     "File": "/tmp/envvar.json"
   },
   "Provider": {
-    "Name": "envvar"
+    "Name": "envvar",
+    "Kubernetes": {
+      "QPS": 16,
+      "Burst": 32
+    }
   },
   "Sessions": {
     "DefaultDuration": 7200000000000,
