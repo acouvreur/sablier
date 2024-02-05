@@ -1,12 +1,13 @@
 name: Docker
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - beta
     tags:
-      - "v*"
+      - "v**"
   pull_request:
 
 jobs:
