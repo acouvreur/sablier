@@ -1,5 +1,5 @@
 ARG CADDY_VERSION=2.7.6
-ARG SABLIER_VERSION=v1.4.0-beta.1
+ARG SABLIER_VERSION=v1.6.0
 FROM caddy:${CADDY_VERSION}-builder AS builder
 
 ADD https://github.com/acouvreur/sablier.git#${SABLIER_VERSION} /sablier

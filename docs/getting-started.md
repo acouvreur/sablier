@@ -78,7 +78,7 @@ services:
     image: containous/whoami:v1.5.0
 
   sablier:
-    image: acouvreur/sablier:1.6.0-beta.1
+    image: acouvreur/sablier:1.6.0
     command:
         - start
         - --provider.name=docker
@@ -113,7 +113,7 @@ services:
     image: containous/whoami:v1.5.0
 
   sablier:
-    image: acouvreur/sablier:1.6.0-beta.1
+    image: acouvreur/sablier:1.6.0
     command:
         - start
         - --provider.name=docker

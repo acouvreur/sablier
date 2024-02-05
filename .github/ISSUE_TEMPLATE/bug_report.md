@@ -11,7 +11,7 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **Context**
- - Sablier version: [e.g. 1.2.0-beta.1]
+ - Sablier version: [e.g. 1.6.0]
  - Provider: [e.g. docker v20.10.21]
  - Reverse proxy: [e.g. traefik v2.8.5]
  - Sablier running inside a container?
