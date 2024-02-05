@@ -5,7 +5,7 @@ services:
     image: traefik:2.10.7
     command:
       - --experimental.plugins.sablier.moduleName=github.com/acouvreur/sablier
-      - --experimental.plugins.sablier.version=v1.4.1-beta.10-beta.11
+      - --experimental.plugins.sablier.version=v1.4.1-beta.11-beta.11
       - --entryPoints.http.address=:80
       - --providers.docker=true
       - --providers.file.filename=/etc/traefik/dynamic-config.yml
@@ -16,7 +16,7 @@ services:
       - './dynamic-config.yml:/etc/traefik/dynamic-config.yml'
 
   sablier:
-    image: acouvreur/sablier:1.4.1-beta.10-beta.11
+    image: acouvreur/sablier:1.4.1-beta.11-beta.11
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
     labels:

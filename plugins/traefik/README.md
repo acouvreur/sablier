@@ -72,7 +72,7 @@ services:
       - --providers.docker=true
       - --providers.file.filename=/etc/traefik/dynamic-config.yml
       - --experimental.plugins.sablier.moduleName=github.com/acouvreur/sablier/plugins/traefik
-      - --experimental.plugins.sablier.version=v1.4.1-beta.10-beta.11
+      - --experimental.plugins.sablier.version=v1.4.1-beta.11-beta.11
     ports:
       - "8080:80"
     volumes:
@@ -80,7 +80,7 @@ services:
       - './dynamic-config.yml:/etc/traefik/dynamic-config.yml'
 
   sablier:
-    image: acouvreur/sablier:1.4.1-beta.10-beta.11
+    image: acouvreur/sablier:1.4.1-beta.11-beta.11
     command:
       - start
       - --provider.name=docker
