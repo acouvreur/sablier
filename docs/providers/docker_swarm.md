@@ -35,7 +35,7 @@ PROVIDER_NAME=docker_swarm # or swarm
 ```yaml
 services:
   sablier:
-    image: acouvreur/sablier:1.7.0-beta.12
+    image: acouvreur/sablier:1.7.0-beta.13
     command:
       - start
       - --provider.name=docker_swarm # or swarm
