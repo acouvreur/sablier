@@ -98,14 +98,14 @@ experimental:
   plugins:
     sablier:
       moduleName: "github.com/acouvreur/sablier"
-      version: "v1.7.0-beta.16"
+      version: "v1.7.0"
 ```
 
 #### **CLI**
 
 ```bash
 --experimental.plugins.sablier.modulename=github.com/acouvreur/sablier
---experimental.plugins.sablier.version=v1.7.0-beta.16
+--experimental.plugins.sablier.version=v1.7.0
 ```
 
 <!-- tabs:end -->
