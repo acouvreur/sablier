@@ -2,3 +2,5 @@ sablier.yaml
 ./plugins/traefik/e2e/kubeconfig.yaml
 node_modules
 .DS_Store
+*.wasm
+kubeconfig.yaml

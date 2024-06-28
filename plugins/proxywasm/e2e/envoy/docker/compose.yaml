@@ -1,0 +1,27 @@
+services:
+  envoy:
+    image: envoyproxy/envoy:v1.30-latest
+    command: /usr/local/bin/envoy -c /etc/envoy.yaml
+    volumes:
+      - ./envoy.yaml:/etc/envoy.yaml
+      - ../../../sablierproxywasm.wasm:/etc/sablierproxywasm.wasm
+    ports:
+      - "8080:8080"
+
+  sablier:
+    image: acouvreur/sablier:local
+    command:
+      - start
+      - --provider.name=docker
+      - --logging.level=trace
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+  whoami:
+    image: containous/whoami:v1.5.0
+
+  nginx:
+    image: nginx:1.26.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 5s
