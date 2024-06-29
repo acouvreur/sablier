@@ -8,7 +8,7 @@ The [Traefik Sablier Plugin](https://plugins.traefik.io/plugins/633b4658a4caa9dd
 | --------------------------------------- | :-----: | :-----------------------------------------------------: |
 | [Docker](/providers/docker)             |    ✅    |                            ✅                            |
 | [Docker Swarm](/providers/docker_swarm) |    ✅    |                            ✅                            |
-| [Kubernetes](/providers/kubernetes)     |    ✅    | ❌ [#62](https://github.com/acouvreur/sablier/issues/62) |
+| [Kubernetes](/providers/kubernetes)     |    ✅    |                            ✅                            |
 
 ## Prerequisites
 
@@ -75,15 +75,13 @@ services:
 
 Traefik also have [allowEmptyServices](https://doc.traefik.io/traefik/providers/docker/#allowemptyservices) option which can be used instead.
 
-But the blocking strategy won't work for the same reasons described in [#62](https://github.com/acouvreur/sablier/issues/62).
-
 #### **Kubernetes**
 
 **Traefik will evict deployments from its pool if they have 0 endpoints available.**
 
 You must use [`allowEmptyServices`](https://doc.traefik.io/traefik/providers/kubernetes-ingress/#allowemptyservices)
 
-The blocking strategy is not supported because everytime the underlying configuration changes, the whole router is regenrated, thus changing the router during a request will still map to the old router. For more details, see [#62](https://github.com/acouvreur/sablier/issues/62).
+The blocking strategy is supported by issuing redirect which force client to retry request. It might fail if client do not support redirections (e.g. `curl` without `-L`). The limitation is caused by Traefik architecture. Everytime the underlying configuration changes, the whole router is regenrated, thus changing the router during a request will still map to the old router. For more details, see [#62](https://github.com/acouvreur/sablier/issues/62).
 
 <!-- tabs:end -->
 
