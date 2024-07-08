@@ -8,18 +8,21 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+// Interface guard
+var _ providers.Provider = (*ProviderMock)(nil)
+
 // ProviderMock is a structure that allows to define the behavior of a Provider
 type ProviderMock struct {
 	mock.Mock
 }
 
-func (m *ProviderMock) Start(ctx context.Context, name string) (instance.State, error) {
+func (m *ProviderMock) Start(ctx context.Context, name string) error {
 	args := m.Called(ctx, name)
-	return args.Get(0).(instance.State), args.Error(1)
+	return args.Error(0)
 }
-func (m *ProviderMock) Stop(ctx context.Context, name string) (instance.State, error) {
+func (m *ProviderMock) Stop(ctx context.Context, name string) error {
 	args := m.Called(ctx, name)
-	return args.Get(0).(instance.State), args.Error(1)
+	return args.Error(0)
 }
 func (m *ProviderMock) GetState(ctx context.Context, name string) (instance.State, error) {
 	args := m.Called(ctx, name)
