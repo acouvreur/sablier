@@ -198,6 +198,7 @@ func (s *SessionsManager) requestSessionInstance(name string, duration time.Dura
 			return nil, err
 		}
 
+		requestState.Name = name
 		requestState.CurrentReplicas = state.CurrentReplicas
 		requestState.DesiredReplicas = state.DesiredReplicas
 		requestState.Status = state.Status
@@ -219,6 +220,7 @@ func (s *SessionsManager) requestSessionInstance(name string, duration time.Dura
 		log.Debugf("status for %s=%s", name, requestState.Status)
 	}
 
+	log.Debugf("expiring %+v in %v", requestState, duration)
 	// Refresh the duration
 	s.ExpiresAfter(&requestState, duration)
 	return &requestState, nil
