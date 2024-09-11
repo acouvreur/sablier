@@ -19,7 +19,7 @@ module.exports = {
     }],
     ["@semantic-release/git", {
       "assets": [["**/*.{md,yml}", "!node_modules/**/*.{md,yml}"]],
-      "message": "docs(release): update doc version from ${lastRelease.version} to ${nextRelease.version} [skip ci]"
+      "message": "docs(release): update doc version from ${lastRelease.version} to ${nextRelease.version}"
     }]
   ]
 }
