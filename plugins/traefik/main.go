@@ -8,6 +8,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptrace"
+	"strings"
+	"time"
 )
 
 type SablierMiddleware struct {
@@ -46,6 +48,12 @@ func (sm *SablierMiddleware) ServeHTTP(rw http.ResponseWriter, req *http.Request
 	defer resp.Body.Close()
 
 	conditonalResponseWriter := newResponseWriter(rw)
+
+	if isWebsocketRequest(req) {
+		// FIXME dynamic make no sense for websocket since client return error
+		fmt.Println("=== websocket request")
+		conditonalResponseWriter.websocket = true
+	}
 
 	useRedirect := false
 
@@ -97,6 +105,7 @@ type responseWriter struct {
 	responseWriter http.ResponseWriter
 	headers        http.Header
 	ready          bool
+	websocket      bool
 }
 
 func (r *responseWriter) Header() http.Header {
@@ -114,6 +123,11 @@ func (r *responseWriter) Write(buf []byte) (int, error) {
 }
 
 func (r *responseWriter) WriteHeader(code int) {
+	//TODO need to check for code 101? Is it possible that after error connection won't be websocket
+	// if code != 101 {
+	// 	r.websocket = false
+	// }
+	fmt.Println("=== code", code)
 	if r.ready == false && code == http.StatusServiceUnavailable {
 		// We get a 503 HTTP Status Code when there is no backend server in the pool
 		// to which the request could be sent.  Also, note that r.ready
@@ -136,11 +150,79 @@ func (r *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	if !ok {
 		return nil, nil, fmt.Errorf("%T is not a http.Hijacker", r.responseWriter)
 	}
-	return hijacker.Hijack()
+	if r.websocket {
+		fmt.Println("=== hijack for websocket")
+		conn, bufio, err := hijacker.Hijack()
+		return newConnWrapper(conn), bufio, err
+	} else {
+		return hijacker.Hijack()
+	}
 }
 
 func (r *responseWriter) Flush() {
 	if flusher, ok := r.responseWriter.(http.Flusher); ok {
 		flusher.Flush()
 	}
+}
+
+func isWebsocketRequest(req *http.Request) bool {
+	return containsHeader(req, "Connection", "upgrade") && containsHeader(req, "Upgrade", "websocket")
+}
+
+func containsHeader(req *http.Request, name, value string) bool {
+	items := strings.Split(req.Header.Get(name), ",")
+	for _, item := range items {
+		if value == strings.ToLower(strings.TrimSpace(item)) {
+			return true
+		}
+	}
+	return false
+}
+
+func newConnWrapper(c net.Conn) *conn {
+	return &conn{
+		conn: c,
+	}
+}
+
+type conn struct {
+	conn net.Conn
+}
+
+func (c *conn) Read(b []byte) (n int, err error) {
+	len, e := c.conn.Read(b)
+	// TODO need to call backend but it must not be done each time since http requests are too slow
+	fmt.Println("=== websocket read", len)
+	return len, e
+}
+
+func (c *conn) Write(b []byte) (n int, err error) {
+	fmt.Println("=== websocket write", len(b))
+	// TODO need to call backend but it must not be done each time since http requests are too slow
+	return c.conn.Write(b)
+}
+
+func (c *conn) Close() error {
+	fmt.Println("=== websocket close")
+	return c.conn.Close()
+}
+
+func (c *conn) LocalAddr() net.Addr {
+	return c.conn.LocalAddr()
+}
+
+func (c *conn) RemoteAddr() net.Addr {
+	return c.conn.RemoteAddr()
+}
+
+func (c *conn) SetDeadline(t time.Time) error {
+	return c.conn.SetDeadline(t)
+}
+
+func (c *conn) SetReadDeadline(t time.Time) error {
+	return c.conn.SetReadDeadline(t)
+}
+
+func (c *conn) SetWriteDeadline(t time.Time) error {
+	return c.conn.SetWriteDeadline(t)
 }
