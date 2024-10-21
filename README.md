@@ -1,5 +1,9 @@
 # Sablier
 
+> [!CAUTION]
+> The sablier repository has moved to [sablierapp/sablier](https://github.com/sablierapp/sablier)!
+> This repository is archived for legacy compatibility!
+
 [![GitHub license](https://img.shields.io/github/license/acouvreur/sablier.svg)](https://github.com/acouvreur/sablier/blob/master/LICENSE)
 [![GitHub contributors](https://img.shields.io/github/contributors/acouvreur/sablier.svg)](https://GitHub.com/acouvreur/sablier/graphs/contributors/)
 [![GitHub issues](https://img.shields.io/github/issues/acouvreur/sablier.svg)](https://GitHub.com/acouvreur/sablier/issues/)
